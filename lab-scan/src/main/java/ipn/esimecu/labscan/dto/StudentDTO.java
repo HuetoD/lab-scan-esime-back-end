@@ -1,4 +1,5 @@
 package ipn.esimecu.labscan.dto;
 
-public record StudentDTO() {
+public class StudentDTO {
+
 }
