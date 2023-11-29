@@ -1,17 +1,30 @@
 package ipn.esimecu.labscan.dto.response;
 
-import ipn.esimecu.labscan.dto.Annotation;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+
 import ipn.esimecu.labscan.dto.AttendanceDTO;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 
 public class AttendanceResponse extends AttendanceDTO  {
     
-@Annotation ("teacher_full_name")
-private String TeacherFullName;
-@Annotation ("group_name")
-private String GroupName;
-@Annotation ("laboratory_name")
-private String LaboratoryName;
+@JsonProperty ("teacher_full_name")
+private String TteacherFullName;
+@JsonProperty ("group_name")
+private String groupName;
+@JsonProperty ("laboratory_name")
+private String laboratoryName;
 private String when;
-@Annotation ("ws_code")
-private String WsCode;
+@JsonProperty ("ws_code")
+private String wsCode;
 }

@@ -1,15 +1,30 @@
 package ipn.esimecu.labscan.dto.response;
 
+import java.io.Serializable;
 import java.time.LocalDate;
-import ipn.esimecu.labscan.dto.Annotation;
 
-public class SemesterResponse {
-    @Annotation ("semester_id")
-    private int SemesterId;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+
+
+public class SemesterResponse implements Serializable {
+    private static final long serialVersionUID = 1L; 
+    @JsonProperty ("semester_id")
+    private int semesterId;
     private String name;
-    @Annotation ("start_date")
-    private LocalDate StartDate;
-    @Annotation ("end_date")
-    private LocalDate EndDate;
+    @JsonProperty ("start_date")
+    private LocalDate startDate;
+    @JsonProperty ("end_date")
+    private LocalDate endDate;
     
 }
