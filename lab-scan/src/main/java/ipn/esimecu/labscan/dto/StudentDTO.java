@@ -1,4 +1,4 @@
-package ipn.esimecu.labscan;
+package ipn.esimecu.labscan.dto;
 
 import java.io.Serializable;
 

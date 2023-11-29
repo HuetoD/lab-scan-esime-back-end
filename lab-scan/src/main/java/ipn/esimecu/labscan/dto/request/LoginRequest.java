@@ -1,4 +1,4 @@
-package ipn.esimecu.labscan;
+package ipn.esimecu.labscan.dto.request;
 
 public class LoginRequest {
     private String email;
