@@ -1,19 +1,6 @@
-package ipn.esimecu.labscan.dto.request;
+package ipn.esimecu.labscan;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.io.Serializable;
-
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-public class LoginRequest implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-
+public class LoginRequest {
+    private String email;
+    private String password;
 }
