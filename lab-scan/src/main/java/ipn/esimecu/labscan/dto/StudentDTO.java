@@ -16,15 +16,24 @@ import lombok.Setter;
 @Setter
 
 public class StudentDTO implements Serializable {
+
     private static final long serialVersionUID = 1L;
+
     @JsonProperty ("student_id")
-    private int studentId; 
+    private int studentId;
+
     @JsonProperty ("student_identification_type")
     private String studentIdentificationType;
+
     @JsonProperty ("student_report_number")
     private String studentReportNumber;
+
+    @JsonProperty("student_full_name")
+    private String studentFullName;
+
     @JsonProperty ("student_pc_number")
     private String studentPcNumber;
+
     @JsonProperty ("student_qr_code")
     private String studentQrCode;
 
