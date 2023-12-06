@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 
 
 @Entity
@@ -30,5 +29,8 @@ public class RolesUsuariosEntity {
       @ManyToOne(fetch = FetchType.LAZY)
       @JoinColumn(name = "usuario_id")
     private UsuariosEntity user;
-   
+
+      @ManyToOne(fetch = FetchType.LAZY)
+      @JoinColumn(name ="rol_id")
+    private RolesEntity rol;   
 }

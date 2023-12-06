@@ -1,9 +1,14 @@
 package ipn.esimecu.labscan.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.GeneratedValue;
+
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
@@ -30,4 +35,8 @@ public class ProfesoresEntity {
     private int profesorId;
     @Column (name = "nombre_completo")
     private String nombreCompleto;
+
+    @OneToMany(mappedBy = "profesorIde", fetch = FetchType.LAZY)
+    private List<AsignaturasEntity> profesorIdeEntities;
+
 }

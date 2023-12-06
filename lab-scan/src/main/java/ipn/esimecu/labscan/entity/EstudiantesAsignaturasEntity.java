@@ -1,8 +1,11 @@
 package ipn.esimecu.labscan.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Column;
 import jakarta.persistence.GenerationType;
@@ -26,4 +29,13 @@ public class EstudiantesAsignaturasEntity {
     
     @Column (name = "estudiante_asignatura_id")
     private int estudianteAsignaturaId;   
+
+    @ManyToOne(fetch = FetchType.LAZY)
+      @JoinColumn(name ="estudiante_id")
+    private StudentEntity estudianteIde;   
+
+    @ManyToOne(fetch = FetchType.LAZY)
+      @JoinColumn(name ="asignatura_id")
+    private AsignaturasEntity asignaturaIde;   
+
 }

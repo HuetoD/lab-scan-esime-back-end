@@ -31,4 +31,5 @@ public class UsuariosEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<RolesUsuariosEntity> rolesUsersEntities;
 
+   
 }
