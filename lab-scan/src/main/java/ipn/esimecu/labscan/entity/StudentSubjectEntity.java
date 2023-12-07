@@ -4,12 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Column;
-import java.time.LocalDate;
-import java.util.List;
-
 import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,26 +16,24 @@ import lombok.Setter;
 
 
 @Entity
-@Table(name = "semestres")
+@Table(name = "estudiantes_asignaturas")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+public class StudentSubjectEntity {
 
-
-
-
-public class SemestresEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "semestre_id")
-    private int semesteId;
-    @Column (name = "fecha_inicio")
-    private LocalDate fechaInicio;
-    @Column (name = "fecha_fin")
-    private LocalDate fechaFin;
+    @Column(name = "estudiante_asignatura_id")
+    private int id;
 
-    @OneToMany(mappedBy = "semestreIde", fetch = FetchType.LAZY)
-    private List<AsignaturasEntity> semestreIdeEntities;
-    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "estudiante_id")
+    private StudentEntity student;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "asignatura_id")
+    private SubjectEntity subject;
+
 }

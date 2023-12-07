@@ -18,25 +18,21 @@ import lombok.Setter;
 
 
 @Entity
-@Table(name = "profesores")
+@Table(name = "roles")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+public class RoleEntity {
 
-
-
-
-public class ProfesoresEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    
-    @Column (name = "profesor_id")
-    private int profesorId;
-    @Column (name = "nombre_completo")
-    private String nombreCompleto;
+    @Column(name = "role_id")
+    private int roleId;
 
-    @OneToMany(mappedBy = "profesorIde", fetch = FetchType.LAZY)
-    private List<AsignaturasEntity> profesorIdeEntities;
+    @Column(name = "role_name")
+    private String roleName;
 
+    @OneToMany(mappedBy = "rol", fetch = FetchType.LAZY)
+    private List<RoleUserEntity> roleUsers;
 }

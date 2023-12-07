@@ -6,10 +6,10 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.GeneratedValue;
-
+import jakarta.persistence.Column;
+import java.time.LocalDate;
 import java.util.List;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,21 +18,25 @@ import lombok.Setter;
 
 
 @Entity
-@Table(name = "roles")
+@Table(name = "semestres")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+public class SemesterEntity {
 
-public class RolesEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    
-    @Column (name = "role_id")
-    private int roleId;
-    @Column (name = "role_name")
-    private String roleName;
+    @Column(name = "semestre_id")
+    private int semesterId;
 
-     @OneToMany(mappedBy = "rol", fetch = FetchType.LAZY)
-    private List<RolesUsuariosEntity> rolesEntities;
+    @Column (name = "fecha_inicio")
+    private LocalDate startDate;
+
+    @Column (name = "fecha_fin")
+    private LocalDate endDate;
+
+    @OneToMany(mappedBy = "semestreIde", fetch = FetchType.LAZY)
+    private List<SubjectEntity> subjects;
+    
 }

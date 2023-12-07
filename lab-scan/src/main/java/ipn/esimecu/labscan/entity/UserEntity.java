@@ -15,21 +15,20 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+public class UserEntity {
 
-
-public class UsuariosEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    
-    @Column (name = "usuarios_id")
-    private int usuariosId;
-    @Column (name = "email")
+    @Column(name = "usuarios_id")
+    private int userId;
+
+    @Column(name = "email")
     private String email;
-    @Column (name = "password")
+
+    @Column(name = "password")
     private String password;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<RolesUsuariosEntity> rolesUsersEntities;
+    private List<RoleUserEntity> roleUsers;
 
-   
 }

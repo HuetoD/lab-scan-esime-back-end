@@ -1,6 +1,5 @@
 package ipn.esimecu.labscan.entity;
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
@@ -19,22 +18,21 @@ import lombok.Setter;
 
 
 @Entity
-@Table(name = "cursos")
+@Table(name = "tipo_identificacion")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+public class IdentificationTypeEntity {
 
-
-public class CursosEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    
-    @Column (name = "curso_id")
-    private int cursoId;   
-    @Column (name = "nombre_curso")
-    private String nombreCurso;
+    @Column (name = "identificacion_id")
+    private int id;
 
-    @OneToMany(mappedBy = "cursoIde", fetch = FetchType.LAZY)
-    private List<AsignaturasEntity> cursoIdeEntities;
+    @Column (name = "tipo_identificacion")
+    private String identificationType;
+
+    @OneToMany(mappedBy = "tipoIde", fetch = FetchType.LAZY)
+    private List<StudentEntity> students;
 }

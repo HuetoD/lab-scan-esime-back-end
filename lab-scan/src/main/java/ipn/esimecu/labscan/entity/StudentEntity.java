@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -30,28 +31,34 @@ public class StudentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "estudiante_id")
-    private int estudianteId;
-    @Column(name = "identificacion")
-    private String identificacion;
-    @Column(name = "nombre_completo")
-    private String nombreCompleto;
-    @Column(name = "numero_pc")
-    private String numeroPc;
-    @Column(name = "codigo_qr")
-    private String codigoQr;
-    @Column(name = "creacion_sacadem")
-    private LocalDate creacionSacadem;
-    @Column (name = "foto")
-    private byte[] foto;
+    private int studentId;
 
-     @ManyToOne(fetch = FetchType.LAZY)
-      @JoinColumn(name ="tipo_identificacion")
-    private TipoIdentificacionesEntity tipoIde;   
+    @Column(name = "identificacion")
+    private String identification;
+
+    @Column(name = "nombre_completo")
+    private String fullName;
+
+    @Column(name = "numero_pc")
+    private String pcNumber;
+
+    @Column(name = "codigo_qr")
+    private String qrCode;
+
+    @Column(name = "creacion_sacadem")
+    private LocalDate sacademDate;
+
+    @Column(name = "foto")
+    private byte[] photo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tipo_identificacion")
+    private IdentificationTypeEntity identificationType;
 
     @OneToMany(mappedBy = "estudianteIde", fetch = FetchType.LAZY)
-    private List<EstudiantesAsignaturasEntity> EstudianteIdEntities;
+    private List<StudentSubjectEntity> studentSubjects;
 
-     @OneToMany(mappedBy = "estudiantesIde", fetch = FetchType.LAZY)
-    private List<AsistenciaEntity> EstudiantesIdEntities;
+    @OneToMany(mappedBy = "estudiantesIde", fetch = FetchType.LAZY)
+    private List<AttendanceEntity> attendances;
 
 }

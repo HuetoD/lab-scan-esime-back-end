@@ -4,9 +4,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.GeneratedValue;
+
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
@@ -16,26 +18,24 @@ import lombok.Setter;
 
 
 @Entity
-@Table(name = "estudiantes_asignaturas")
+@Table(name = "asignaturas")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+public class GroupEntity {
 
-
-public class EstudiantesAsignaturasEntity {
-     @Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    
-    @Column (name = "estudiante_asignatura_id")
-    private int estudianteAsignaturaId;   
+    @Column(name = "grupo_id")
+    private int groupId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-      @JoinColumn(name ="estudiante_id")
-    private StudentEntity estudianteIde;   
+    @Column(name = "nombre")
+    private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-      @JoinColumn(name ="asignatura_id")
-    private AsignaturasEntity asignaturaIde;   
+    @Column(name = "turno")
+    private char shift;
 
+    @OneToMany(mappedBy = "curso", fetch = FetchType.LAZY)
+    private List<SubjectEntity> subjects;
 }
