@@ -36,6 +36,6 @@ public class GroupEntity {
     @Column(name = "turno")
     private char shift;
 
-    @OneToMany(mappedBy = "curso", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     private List<SubjectEntity> subjects;
 }

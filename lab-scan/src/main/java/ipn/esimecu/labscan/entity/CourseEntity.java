@@ -34,6 +34,6 @@ public class CourseEntity {
     @Column (name = "nombre_curso")
     private String courseName;
 
-    @OneToMany(mappedBy = "cursoIde", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY)
     private List<SubjectEntity> subjects;
 }

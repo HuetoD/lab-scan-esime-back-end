@@ -33,6 +33,6 @@ public class IdentificationTypeEntity {
     @Column (name = "tipo_identificacion")
     private String identificationType;
 
-    @OneToMany(mappedBy = "tipoIde", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "identificationType", fetch = FetchType.LAZY)
     private List<StudentEntity> students;
 }

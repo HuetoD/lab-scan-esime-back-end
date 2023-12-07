@@ -34,6 +34,6 @@ public class LaboratoryEntity {
     @Column(name = "nombre")
     private String name;
 
-    @OneToMany(mappedBy = "laboratorioIde", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "laboratory", fetch = FetchType.LAZY)
     private List<SubjectEntity> subjects;
 }

@@ -36,7 +36,7 @@ public class SemesterEntity {
     @Column (name = "fecha_fin")
     private LocalDate endDate;
 
-    @OneToMany(mappedBy = "semestreIde", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "semester", fetch = FetchType.LAZY)
     private List<SubjectEntity> subjects;
     
 }

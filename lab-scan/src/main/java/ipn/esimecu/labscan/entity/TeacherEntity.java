@@ -33,7 +33,7 @@ public class TeacherEntity {
     @Column(name = "nombre_completo")
     private String fullName;
 
-    @OneToMany(mappedBy = "profesorIde", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY)
     private List<SubjectEntity> subjects;
 
 }

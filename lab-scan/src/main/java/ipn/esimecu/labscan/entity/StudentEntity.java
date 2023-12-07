@@ -55,10 +55,10 @@ public class StudentEntity {
     @JoinColumn(name = "tipo_identificacion")
     private IdentificationTypeEntity identificationType;
 
-    @OneToMany(mappedBy = "estudianteIde", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
     private List<StudentSubjectEntity> studentSubjects;
 
-    @OneToMany(mappedBy = "estudiantesIde", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
     private List<AttendanceEntity> attendances;
 
 }

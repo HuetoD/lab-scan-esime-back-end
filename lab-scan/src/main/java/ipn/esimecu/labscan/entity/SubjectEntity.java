@@ -30,13 +30,13 @@ public class SubjectEntity {
     @Column(name = "asignatura_id")
     private int subjectId;
 
-    @OneToMany(mappedBy = "asignaturaIde", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "subject", fetch = FetchType.LAZY)
     private List<StudentSubjectEntity> studentSubjects;
 
     @OneToMany(mappedBy = "subject", fetch = FetchType.LAZY)
     private List<AttendanceEntity> attendances;
 
-    @OneToMany(mappedBy = "asignaturaIde", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "subject", fetch = FetchType.LAZY)
     private List<ScheduleEntity> schedules;
 
     @ManyToOne(fetch = FetchType.LAZY)
