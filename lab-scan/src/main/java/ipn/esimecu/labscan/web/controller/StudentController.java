@@ -4,9 +4,11 @@ import ipn.esimecu.labscan.dto.GroupDTO;
 import ipn.esimecu.labscan.dto.LaboratoryDTO;
 import ipn.esimecu.labscan.dto.StudentDTO;
 import ipn.esimecu.labscan.dto.request.StudentRequest;
+import ipn.esimecu.labscan.dto.request.TransferRequest;
 import ipn.esimecu.labscan.dto.response.SemesterResponse;
 import ipn.esimecu.labscan.service.CommonService;
 import ipn.esimecu.labscan.service.StudentService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -61,21 +63,21 @@ public class StudentController {
     }
 
     @PostMapping("save-student")
-    public ResponseEntity<String> saveStudent(@RequestBody StudentRequest request) {
+    public ResponseEntity<String> saveStudent(@RequestBody @Valid StudentRequest request) {
         studentService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Nuevo estudiante creado");
+                             .body("Nuevo estudiante creado");
     }
 
     @PutMapping("update-student")
-    public ResponseEntity<String> updateStudent(@RequestBody StudentRequest request) {
+    public ResponseEntity<String> updateStudent(@RequestBody @Valid StudentRequest request) {
         studentService.update(request);
         return ResponseEntity.ok("Se ha actualizado al estudiante: ".concat(request.getStudentFullName()));
     }
 
     @PatchMapping("transfer-student")
-    public ResponseEntity<String> transferStudent(@RequestBody Object body) {
-        studentService.transfer(0, 1);
+    public ResponseEntity<String> transferStudent(@RequestBody TransferRequest request) {
+        studentService.transfer(request.getFromStudentId(), request.getToStudentId());
         return ResponseEntity.ok("Dos estudiantes han intercambiado de computadora");
     }
 

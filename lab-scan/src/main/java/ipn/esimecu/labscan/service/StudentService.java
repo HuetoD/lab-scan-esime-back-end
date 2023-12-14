@@ -53,12 +53,12 @@ public class StudentService {
     }
 
     @Transactional
-    public void transfer(int studentIdFrom, int studentIdTo) {
-        StudentEntity from = studentRepository.findById(studentIdFrom)
-                                              .orElseThrow(createSupplierStudentNotFound(studentIdFrom));
+    public void transfer(int fromStudentId, int toStudentId) {
+        StudentEntity from = studentRepository.findById(fromStudentId)
+                                              .orElseThrow(createSupplierStudentNotFound(fromStudentId));
 
-        StudentEntity to = studentRepository.findById(studentIdTo)
-                                            .orElseThrow(createSupplierStudentNotFound(studentIdTo));
+        StudentEntity to = studentRepository.findById(toStudentId)
+                                            .orElseThrow(createSupplierStudentNotFound(toStudentId));
         String temporal = from.getPcNumber();
         from.setPcNumber(to.getPcNumber());
         to.setPcNumber(temporal);
