@@ -18,7 +18,7 @@ import lombok.Setter;
 
 
 @Entity
-@Table(name = "tipo_identificacion")
+@Table(name = "tipo_identificaciones")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -30,7 +30,7 @@ public class IdentificationTypeEntity {
     @Column (name = "identificacion_id")
     private int id;
 
-    @Column (name = "tipo_identificacion")
+    @Column (name = "tipo")
     private String identificationType;
 
     @OneToMany(mappedBy = "identificationType", fetch = FetchType.LAZY)

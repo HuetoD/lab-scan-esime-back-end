@@ -15,10 +15,14 @@ import jakarta.persistence.Basic;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
-@Table(name = "cursos")
+@Table(name = "horarios")
+@EqualsAndHashCode(exclude = {"subject"})
+@ToString(exclude = {"subject"})
 @AllArgsConstructor
 @NoArgsConstructor
 public class ScheduleEntity {
@@ -29,7 +33,7 @@ public class ScheduleEntity {
     private int scheduleId;
 
     @Basic
-    @Column(name = "day")
+    @Column(name = "dia")
     private int dayValue;
 
     @Transient
@@ -55,6 +59,14 @@ public class ScheduleEntity {
 
     public void setScheduleId(int scheduleId) {
         this.scheduleId = scheduleId;
+    }
+
+    public int getDayValue() {
+        return dayValue;
+    }
+
+    public void setDayValue(int dayValue) {
+        this.dayValue = dayValue;
     }
 
     public Day getDay() {

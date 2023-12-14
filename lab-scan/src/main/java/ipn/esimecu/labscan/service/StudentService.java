@@ -1,27 +1,82 @@
 package ipn.esimecu.labscan.service;
 
-import ipn.esimecu.labscan.dto.GroupDTO;
 import ipn.esimecu.labscan.dto.StudentDTO;
+import ipn.esimecu.labscan.dto.request.StudentRequest;
+import ipn.esimecu.labscan.entity.StudentEntity;
+import ipn.esimecu.labscan.mapper.StudentMapper;
+import ipn.esimecu.labscan.repository.IdentificationTypeRepository;
+import ipn.esimecu.labscan.repository.StudentRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.function.Supplier;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StudentService {
 
+    private final StudentRepository studentRepository;
+
+    private final IdentificationTypeRepository identificationTypeRepository;
+
+    private final StudentMapper studentMapper;
+
+    private final SubjectService subjectService;
+
+    private final StudentSubjectService studentSubjectService;
     private final DaeService daeService;
 
-    public StudentDTO findStudent(String qrCode) {
-        //find with repo
-        //else with dae and save student
-        return daeService.findStudent(qrCode);
+    @Transactional
+    public void save(StudentRequest request) {
+        StudentEntity student = studentMapper.map(request);
+        student.setIdentificationType(
+                identificationTypeRepository.findByIdentificationType(request.getStudentIdentificationType())
+                                            .orElseThrow(() -> new EntityNotFoundException("No se encontrado un tipo de identificacion de nombre: "
+                                                                                            + request.getStudentIdentificationType())));
+
+        studentSubjectService.save(studentRepository.save(student), subjectService.saveSubjects(request));
     }
 
-    public List<GroupDTO> getGroups() {
+    @Transactional
+    public void update(StudentRequest request) {
+        StudentEntity student = studentMapper.map(request, studentRepository.findById(request.getStudentId())
+                                                                            .orElseThrow(createSupplierStudentNotFound(request.getStudentId())));
 
-        return null;
+        studentSubjectService.deleteAll(student.getStudentSubjects());
+
+        studentSubjectService.save(studentRepository.save(student), subjectService.saveSubjects(request));
+    }
+
+    @Transactional
+    public void transfer(int studentIdFrom, int studentIdTo) {
+        StudentEntity from = studentRepository.findById(studentIdFrom)
+                                              .orElseThrow(createSupplierStudentNotFound(studentIdFrom));
+
+        StudentEntity to = studentRepository.findById(studentIdTo)
+                                            .orElseThrow(createSupplierStudentNotFound(studentIdTo));
+        String temporal = from.getPcNumber();
+        from.setPcNumber(to.getPcNumber());
+        to.setPcNumber(temporal);
+        studentRepository.saveAll(Arrays.asList(from, to));
+    }
+    @Transactional(readOnly = true)
+    public StudentDTO findStudent(String qrCode) {
+        return studentRepository.findByQrCode(qrCode)
+                                .map(studentMapper::map)
+                                .orElse(daeService.findStudent(qrCode));
+    }
+
+    public void getAllStudentsOfSubject() {
+
+    }
+
+    private Supplier<EntityNotFoundException> createSupplierStudentNotFound(int id) {
+        return () -> new EntityNotFoundException("No se ha encontrado al estudiante con id: " + id);
     }
 
 }

@@ -1,6 +1,9 @@
 package ipn.esimecu.labscan.entity;
 
+import ipn.esimecu.labscan.entity.constant.Role;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
@@ -31,7 +34,8 @@ public class RoleEntity {
     private int roleId;
 
     @Column(name = "role_name")
-    private String roleName;
+    @Enumerated(EnumType.STRING)
+    private Role roleName;
 
     @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
     private List<RoleUserEntity> roleUsers;

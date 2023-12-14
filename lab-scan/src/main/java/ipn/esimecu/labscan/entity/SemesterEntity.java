@@ -12,21 +12,25 @@ import java.util.List;
 
 import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 
 @Entity
 @Table(name = "semestres")
 @Getter
 @Setter
+@EqualsAndHashCode(exclude = {"subjects"})
+@ToString(exclude = {"subjects"})
 @AllArgsConstructor
 @NoArgsConstructor
 public class SemesterEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "semestre_id")
     private int semesterId;
 

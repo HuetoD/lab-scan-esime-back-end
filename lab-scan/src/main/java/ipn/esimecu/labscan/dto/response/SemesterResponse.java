@@ -9,21 +9,26 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-
-
+@ToString
 public class SemesterResponse implements Serializable {
-    private static final long serialVersionUID = 1L; 
+
+    private static final long serialVersionUID = 1L;
+
     @JsonProperty ("semester_id")
     private int semesterId;
+
     private String name;
+
     @JsonProperty ("start_date")
     private LocalDate startDate;
+
     @JsonProperty ("end_date")
     private LocalDate endDate;
     

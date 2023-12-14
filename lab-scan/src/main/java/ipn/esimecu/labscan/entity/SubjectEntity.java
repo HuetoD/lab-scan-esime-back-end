@@ -1,5 +1,6 @@
 package ipn.esimecu.labscan.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
@@ -17,10 +18,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
+
 @Entity
 @Table(name = "asignaturas")
 @Getter
 @Setter
+@ToString(exclude = {"studentSubjects", "attendances", "schedules", "subjectLaboratories"})
 @AllArgsConstructor
 @NoArgsConstructor
 public class SubjectEntity {
@@ -36,8 +40,11 @@ public class SubjectEntity {
     @OneToMany(mappedBy = "subject", fetch = FetchType.LAZY)
     private List<AttendanceEntity> attendances;
 
-    @OneToMany(mappedBy = "subject", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "subject", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
     private List<ScheduleEntity> schedules;
+
+    @OneToMany(mappedBy = "subject", fetch = FetchType.LAZY)
+    private List<SubjectLaboratoryEntity> subjectLaboratories;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "curso_id")
@@ -54,8 +61,4 @@ public class SubjectEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "semestre_id")
     private SemesterEntity semester;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "laboratorio_id")
-    private LaboratoryEntity laboratory;
 }

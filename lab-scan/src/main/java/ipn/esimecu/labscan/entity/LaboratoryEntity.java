@@ -13,15 +13,19 @@ import java.util.List;
 import jakarta.persistence.Column;
 import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 
 @Entity
 @Table(name = "laboratorios")
 @Getter
 @Setter
+@EqualsAndHashCode(exclude = {"subjectLaboratories"})
+@ToString(exclude = {"subjectLaboratories"})
 @AllArgsConstructor
 @NoArgsConstructor
 public class LaboratoryEntity {
@@ -35,5 +39,5 @@ public class LaboratoryEntity {
     private String name;
 
     @OneToMany(mappedBy = "laboratory", fetch = FetchType.LAZY)
-    private List<SubjectEntity> subjects;
+    private List<SubjectLaboratoryEntity> subjectLaboratories;
 }

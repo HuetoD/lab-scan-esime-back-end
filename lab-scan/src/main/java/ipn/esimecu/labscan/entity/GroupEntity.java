@@ -12,15 +12,19 @@ import java.util.List;
 import jakarta.persistence.Column;
 import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 
 @Entity
-@Table(name = "asignaturas")
+@Table(name = "grupos")
 @Getter
 @Setter
+@EqualsAndHashCode(exclude = {"sujects"})
+@ToString(exclude = {"subjects"})
 @AllArgsConstructor
 @NoArgsConstructor
 public class GroupEntity {
