@@ -33,8 +33,8 @@ public class ExceptionHandling {
                                                 .build());
     }
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorResponse> authenticationExceptionHandler(AuthenticationException exception) {
+    @ExceptionHandler({AuthenticationException.class, UserNotFoundException.class})
+    public ResponseEntity<ErrorResponse> authenticationExceptionHandler() {
         return ResponseEntity.badRequest()
                              .body(
                                 ErrorResponse.builder()
@@ -91,5 +91,13 @@ public class ExceptionHandling {
                                                     .build());
     }
 
+    @ExceptionHandler(UnsentMailException.class)
+    public ResponseEntity<ErrorResponse> unsentMailExceptionHandler(UnsentMailException exception) {
+        return ResponseEntity.internalServerError()
+                .body(ErrorResponse.builder()
+                        .message(INTERNAL_SERVER_ERROR)
+                        .details(exception.getMessage())
+                        .build());
+    }
 
 }

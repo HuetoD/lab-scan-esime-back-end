@@ -6,7 +6,6 @@ import ipn.esimecu.labscan.dto.StudentDTO;
 import ipn.esimecu.labscan.entity.GroupEntity;
 import ipn.esimecu.labscan.entity.LaboratoryEntity;
 import ipn.esimecu.labscan.entity.StudentEntity;
-import ipn.esimecu.labscan.entity.StudentSubjectEntity;
 import ipn.esimecu.labscan.entity.SubjectEntity;
 import org.springframework.stereotype.Component;
 
@@ -71,22 +70,23 @@ public class StudentMapper implements SuperMapper<StudentEntity, StudentBaseDTO>
         dto.setStudentIdentificationType(entity.getIdentificationType().getIdentificationType());
         dto.setSacademRegisterDate(entity.getSacademDate());
         dto.setPhoto(Optional.ofNullable(entity.getPhoto()).map(Object::toString).orElse(null)); // WRONG
-        entity.getStudentSubjects().stream().flatMap(s -> s.getSubject().getSubjectLaboratories().stream()).forEach(subjectLab -> {
-            LaboratoryEntity laboratory = subjectLab.getLaboratory();
-            SubjectEntity subject = subjectLab.getSubject();
-            GroupEntity groupEntity = subject.getGroup();
-            final String key = laboratory.getName();
-            if(!groups.containsKey(key))
-                groups.put(key, new ArrayList<>());
-            groups.get(key).add(GroupDTO.builder()
-                    .groupName(groupEntity.getName() + " - " + key)
-                    .subjectId(subject.getSubjectId())
-                    .subjectLabId(subjectLab.getLaboratory().getLaboratoryId())
-                    .build());
+        entity.getStudentSubjects().stream().flatMap(s -> s.getSubject().getSubjectLaboratories().stream())
+                .forEach(subjectLab -> {
+                    LaboratoryEntity laboratory = subjectLab.getLaboratory();
+                    SubjectEntity subject = subjectLab.getSubject();
+                    GroupEntity groupEntity = subject.getGroup();
+                    final String key = laboratory.getName();
+                    if (!groups.containsKey(key))
+                        groups.put(key, new ArrayList<>());
+                    groups.get(key).add(GroupDTO.builder()
+                            .groupName(groupEntity.getName() + " - " + key)
+                            .subjectId(subject.getSubjectId())
+                            .subjectLabId(subjectLab.getLaboratory().getLaboratoryId())
+                            .build());
 
-            if(dto.getSemesterId() == -1)
-                dto.setSemesterId(subject.getSemester().getSemesterId());
-        });
+                    if (dto.getSemesterId() == -1)
+                        dto.setSemesterId(subject.getSemester().getSemesterId());
+                });
         dto.setSemesterId(dto.getSemesterId() == -1 ? 0 : dto.getSemesterId());
         dto.setGroups(groups);
         return dto;

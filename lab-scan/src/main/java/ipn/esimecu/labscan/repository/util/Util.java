@@ -1,4 +1,4 @@
-package ipn.esimecu.labscan.util;
+package ipn.esimecu.labscan.repository.util;
 
 import java.security.SecureRandom;
 

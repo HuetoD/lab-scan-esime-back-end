@@ -2,7 +2,7 @@ package ipn.esimecu.labscan.service;
 
 import ipn.esimecu.labscan.dto.AttendanceBaseDTO;
 import ipn.esimecu.labscan.entity.SubjectEntity;
-import ipn.esimecu.labscan.util.Util;
+import ipn.esimecu.labscan.repository.util.Util;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;

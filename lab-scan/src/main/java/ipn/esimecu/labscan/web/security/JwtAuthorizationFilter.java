@@ -1,6 +1,6 @@
 package ipn.esimecu.labscan.web.security;
 
-import ipn.esimecu.labscan.util.JwtTokenProvider;
+import ipn.esimecu.labscan.repository.util.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

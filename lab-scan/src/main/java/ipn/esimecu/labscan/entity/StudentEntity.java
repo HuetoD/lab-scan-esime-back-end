@@ -1,6 +1,5 @@
 package ipn.esimecu.labscan.entity;
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
@@ -18,14 +17,15 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Optional;
 
 @Entity
 @Table(name = "estudiantes")
 @Getter
 @Setter
-@ToString(exclude = {"studentSubjects", "attendances"})
+@ToString(exclude = { "studentSubjects", "attendances" })
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentEntity {
@@ -62,5 +62,9 @@ public class StudentEntity {
 
     @OneToMany(mappedBy = "student", fetch = FetchType.LAZY)
     private List<AttendanceEntity> attendances;
+
+    public List<StudentSubjectEntity> getStudentSubjects() {
+        return Optional.ofNullable(studentSubjects).orElseGet(ArrayList::new);
+    }
 
 }

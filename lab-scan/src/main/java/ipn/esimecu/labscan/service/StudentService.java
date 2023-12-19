@@ -90,11 +90,17 @@ public class StudentService {
 
     @Transactional(noRollbackFor = {DaeServiceException.class})
     public StudentDTO findStudentWithDaeService(String qrcode) throws DaeServiceException {
+        final String identificationType = "CREDENCIAL ESTUDIANTE";
         BiFunction<StudentEntity, StudentBaseDTO, StudentEntity> studentFn = (student, base) -> {
             student.setSacademDate(null);
             student.setQrCode(qrcode);
             student.setFullName(base.getStudentFullName());
             student.setIdentification(base.getStudentReportNumber());
+            student.setIdentificationType(identificationTypeRepository.findByIdentificationType(identificationType)
+                                                                        .orElseThrow(() -> new EntityNotFoundException("No se ha podido guardar " +
+                                                                                                                        "la informacion del estudiante " +
+                                                                                                                        "porque no existe un tipo de " +
+                                                                                                                        "identificacion llamado: " + identificationType)));
             return student;
         };
         return Optional.ofNullable(daeService.findStudent(qrcode))

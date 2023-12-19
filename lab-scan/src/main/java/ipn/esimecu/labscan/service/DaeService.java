@@ -30,18 +30,21 @@ public class DaeService {
 
             page = webClient.getPage(DAE_SERVICE_URL.concat(qrCode));
 
-            final Function<String, DaeServiceException> daeExceptionFunc = message -> new DaeServiceException(message, false);
+            final Function<String, DaeServiceException> daeExceptionFunc = message -> new DaeServiceException(message,
+                    false);
 
-            if(getFirstDivByClassName("wrapper") != null)
+            if (getFirstDivByClassName("wrapper").orElse(null) != null)
                 throw daeExceptionFunc.apply("Sello inexistente");
 
             StudentBaseDTO studentBaseDTO = new StudentBaseDTO();
             studentBaseDTO.setStudentId(0);
-            studentBaseDTO.setStudentFullName(getFirstDivByClassName("nombre").orElseThrow(() -> daeExceptionFunc.apply("Nombre inexsitente"))
-                                                                              .getTextContent());
+            studentBaseDTO.setStudentFullName(
+                    getFirstDivByClassName("nombre").orElseThrow(() -> daeExceptionFunc.apply("Nombre inexsitente"))
+                            .getTextContent());
             studentBaseDTO.setStudentPcNumber("");
-            studentBaseDTO.setStudentReportNumber(getFirstDivByClassName("boleta").orElseThrow(() -> daeExceptionFunc.apply("Boleata inexistente"))
-                                                                                  .getTextContent());
+            studentBaseDTO.setStudentReportNumber(
+                    getFirstDivByClassName("boleta").orElseThrow(() -> daeExceptionFunc.apply("Boleta inexistente"))
+                            .getTextContent());
             studentBaseDTO.setStudentQrCode(qrCode);
 
             return studentBaseDTO;

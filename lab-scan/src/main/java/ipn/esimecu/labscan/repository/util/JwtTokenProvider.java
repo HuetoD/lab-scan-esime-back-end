@@ -1,4 +1,4 @@
-package ipn.esimecu.labscan.util;
+package ipn.esimecu.labscan.repository.util;
 
 import ipn.esimecu.labscan.web.security.SecurityConstant;
 import jakarta.servlet.http.HttpServletRequest;

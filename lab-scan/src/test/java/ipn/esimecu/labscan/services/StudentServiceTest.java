@@ -67,7 +67,7 @@ public class StudentServiceTest {
     @Order(5)
     public void findStudentByQrCodeTest() {
         AtomicReference<StudentDTO> response = new AtomicReference<>(null);
-        final String qrCode = "fbb613cb862c2cac2546e356b42943b3c9d53bdbefd9e4fc9deb62589f0c9";
+        final String qrCode = "515248ec6a4ac952444c9493b4e1fabd3e28be4789b8fab291523177ecec5";
         Assertions.assertDoesNotThrow(() -> response.set(studentService.findStudent(qrCode)));
         log.info(response.get().toString());
     }

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ipn.esimecu.labscan.dto.AdminDTO;
 import ipn.esimecu.labscan.dto.response.AdminResponse;
 import ipn.esimecu.labscan.service.SuperUserService;
-import ipn.esimecu.labscan.web.controller.AdminController;
+import ipn.esimecu.labscan.web.controller.SuperUserController;
 import ipn.esimecu.labscan.web.security.SecurityConfig;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -32,8 +32,8 @@ import java.util.List;
 @Disabled
 @Import(SecurityConfig.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@WebMvcTest(AdminController.class)
-public class AdminControllerTest {
+@WebMvcTest(SuperUserController.class)
+public class SuperUserControllerTest {
 
     private static final String API = "http://localhost:8081/admin/";
 
