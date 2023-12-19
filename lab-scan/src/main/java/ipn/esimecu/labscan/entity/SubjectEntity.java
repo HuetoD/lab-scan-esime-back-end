@@ -15,6 +15,7 @@ import java.util.List;
 import jakarta.persistence.Column;
 import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,6 +25,7 @@ import lombok.ToString;
 @Table(name = "asignaturas")
 @Getter
 @Setter
+@EqualsAndHashCode(exclude = {"studentSubjects", "attendances", "schedules", "subjectLaboratories"})
 @ToString(exclude = {"studentSubjects", "attendances", "schedules", "subjectLaboratories"})
 @AllArgsConstructor
 @NoArgsConstructor

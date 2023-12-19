@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface SubjectLaboratoryRepository extends JpaRepository<SubjectLaboratoryEntity, Integer> {
 
-    @Query("SELECT NEW ipn.esimecu.labscan.dto.SubjectLabNameResultDTO(a.subjectId, g.name, l.name) " +
+    @Query("SELECT NEW ipn.esimecu.labscan.dto.SubjectLabNameResultDTO(al.id, a.subjectId, g.name, l.name) " +
             "FROM SubjectLaboratoryEntity al " +
             "LEFT JOIN al.subject a " +
             "LEFT JOIN al.laboratory l " +

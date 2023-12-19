@@ -1,49 +1,44 @@
 package ipn.esimecu.labscan.dto;
 
 import java.io.Serial;
-import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import ipn.esimecu.labscan.dto.GroupDTO;
 
+import ipn.esimecu.labscan.dto.StudentBaseDTO;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class StudentDTO implements Serializable {
+@ToString(callSuper = true, exclude = {"photo"})
+public class StudentDTO extends StudentBaseDTO {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @JsonProperty ("student_id")
-    private int studentId;
+    @JsonProperty ("sacadem_register_date")
+    private LocalDate sacademRegisterDate;
 
-    @JsonProperty ("student_identification_type")
     @NotNull
-    @NotEmpty
-    private String studentIdentificationType;
+    @NotEmpty(message = "Debe incluir una lista de grupos")
+    private Map<String, List<GroupDTO>> groups;
 
-    @JsonProperty ("student_report_number")
-    private String studentReportNumber;
+    private String photo;
 
-    @JsonProperty("student_full_name")
-    @NotNull
-    @NotEmpty
-    private String studentFullName;
-
-    @JsonProperty ("student_pc_number")
-    @NotNull
-    @NotEmpty
-    private String studentPcNumber;
-
-    @JsonProperty ("student_qr_code")
-    private String studentQrCode;
-
+    @JsonProperty("semester_id")
+    @Positive(message = "No se ha incluido el semestre correctamente")
+    private int semesterId;
 }

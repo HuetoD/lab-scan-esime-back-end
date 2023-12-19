@@ -1,7 +1,7 @@
 package ipn.esimecu.labscan.service;
 
 import ipn.esimecu.labscan.dto.GroupDTO;
-import ipn.esimecu.labscan.dto.request.StudentRequest;
+import ipn.esimecu.labscan.dto.StudentDTO;
 import ipn.esimecu.labscan.dto.response.EsimeCuTypeEnumResponse;
 import ipn.esimecu.labscan.dto.response.EventGroupEsimecuResponse;
 import ipn.esimecu.labscan.entity.CourseEntity;
@@ -20,6 +20,7 @@ import ipn.esimecu.labscan.repository.SubjectRepository;
 import ipn.esimecu.labscan.repository.TeacherRepository;
 import jakarta.el.PropertyNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -34,6 +35,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +48,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static ipn.esimecu.labscan.dto.response.EsimeCuTypeEnumResponse.T;
 
@@ -76,7 +79,16 @@ public class SubjectService implements InitializingBean {
 
     private SemesterEntity currentSemester = null;
     private RestTemplate restTemplate;
+
+    @Getter
     private Map<String, List<EventGroupEsimecuResponse>> temporalGroups;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.currentSemester = this.findCurrentSemester();
+        this.restTemplate = new RestTemplate();
+        this.temporalGroups = this.filterGroupsOfEsimeCuApi();
+    }
 
     public ResponseEntity<List<EventGroupEsimecuResponse>> callEsimeCuApi() {
         return restTemplate.exchange(ESIME_CU_API.concat(String.valueOf(this.currentSemester.getSemesterId())),
@@ -115,13 +127,14 @@ public class SubjectService implements InitializingBean {
     }
 
     @Transactional
-    public List<SubjectEntity> saveSubjects(StudentRequest request) {
+    public List<SubjectEntity> saveSubjects(StudentDTO request) {
         List<LaboratoryEntity> labsFound = this.findLaboratoriesOf(request);
         List<SubjectEntity> subjects = new ArrayList<>();
         Set<SubjectEntity> newSubjects = new HashSet<>();
         Map<LaboratoryEntity, List<SubjectEntity>> labSubjectsMap = new HashMap<>();
         for(final var entry : request.getGroups().entrySet()) {
             for(final GroupDTO groupDTO : entry.getValue()) {
+                System.out.println("ID: " + groupDTO.getSubjectId());
                 Optional<SubjectEntity> subject = this.findById(groupDTO.getSubjectId());
                 if(subject.isPresent()) {
                     subjects.add(subject.get());
@@ -191,10 +204,22 @@ public class SubjectService implements InitializingBean {
         return semesterRepository.findById(semesterId).orElseThrow(() -> new EntityNotFoundException("No existe un semestre con id: ".concat(String.valueOf(semesterId))));
     }
 
+    @Transactional(readOnly = true)
+    public long countAllCourses() {
+        return courseRepository.count();
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsCourseByName(String courseName) {
+       return courseRepository.existsByCourseName(courseName);
+    }
     @Transactional
     public CourseEntity findCourseOrCreate(List<EventGroupEsimecuResponse> groups) {
-        final EventGroupEsimecuResponse groupResponse = findFirstGroupResponseOfType(retrieveSublistFromAnyValueOf(this.temporalGroups, groups), T);
+        return findCourseOrCreate(findFirstGroupResponseOfType(retrieveSublistFromAnyValueOf(this.temporalGroups, groups), T));
+    }
 
+    @Transactional
+    public CourseEntity findCourseOrCreate(EventGroupEsimecuResponse groupResponse) {
         return courseRepository.findByCourseName(groupResponse.getSubjectName())
                 .orElseGet(() -> {
                     CourseEntity newCourse = new CourseEntity();
@@ -244,15 +269,8 @@ public class SubjectService implements InitializingBean {
     }
 
     @Transactional(readOnly = true)
-    public List<LaboratoryEntity> findLaboratoriesOf(StudentRequest request) {
+    public List<LaboratoryEntity> findLaboratoriesOf(StudentDTO request) {
         return laboratoryRepository.findByNameIn(request.getGroups().keySet());
-    }
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        this.currentSemester = this.findCurrentSemester();
-        this.restTemplate = new RestTemplate();
-        this.temporalGroups = this.filterGroupsOfEsimeCuApi();
     }
 
     public List<EventGroupEsimecuResponse> getSublistOfSubjectName(String subjectName) {
@@ -309,45 +327,49 @@ public class SubjectService implements InitializingBean {
                 .collect(Collectors.toList());
     }
 
-    private EventGroupEsimecuResponse findFirstGroupResponseOfType(List<EventGroupEsimecuResponse> groups, EsimeCuTypeEnumResponse type) {
+    public Map<String, List<EventGroupEsimecuResponse>> findEntriesOfLaboratoryAndGroupFromTemporalGroups(LaboratoryEntity laboratory, String groupName) throws NoSuchElementException {
+        final var entries = this.findEntriesOfLaboratoryAndGroup(this.temporalGroups, laboratory, Optional.ofNullable(groupName));
+        if(entries == null || entries.isEmpty())
+            throw new NoSuchElementException(
+                    "No se encontraron asignaturas del semestre "
+                            + currentSemester.getSemesterId()
+                            + ", para el " + laboratory.getName()
+                            + " y con grupo en el " + groupName
+                            + " :: Inicio | fin del semestre: " + "[" + currentSemester.getStartDate() + " | " + currentSemester.getEndDate() + "]");
+        return entries;
+    }
+
+    public EventGroupEsimecuResponse findFirstGroupResponseOfType(List<EventGroupEsimecuResponse> groups, EsimeCuTypeEnumResponse type) {
         return findFirstGroupResponseFiltered(groups, group -> group.getType().equals(type));
     }
 
-    private EventGroupEsimecuResponse findFirstGroupResponseFiltered(List<EventGroupEsimecuResponse> groups, Predicate<? super EventGroupEsimecuResponse> predicate) throws NoSuchElementException {
+    public Optional<EventGroupEsimecuResponse> findFirstOptionalGroupResponseFiltered(List<EventGroupEsimecuResponse> groups, Predicate<? super EventGroupEsimecuResponse> predicate) {
         return groups.stream()
                 .filter(predicate)
-                .findFirst()
-                .orElseThrow();
+                .findFirst();
     }
 
-    private List<EventGroupEsimecuResponse> filterEventGroupSublist(List<EventGroupEsimecuResponse> groups, Predicate<? super EventGroupEsimecuResponse> predicate) {
+    public EventGroupEsimecuResponse findFirstGroupResponseFiltered(List<EventGroupEsimecuResponse> groups, Predicate<? super EventGroupEsimecuResponse> predicate) throws NoSuchElementException {
+        return this.findFirstOptionalGroupResponseFiltered(groups, predicate)
+                .orElseThrow(() -> new NoSuchElementException("No se pudo aplicar el predicate usando la lista: " + groups.toString()));
+    }
+
+    public List<EventGroupEsimecuResponse> filterEventGroupSublist(List<EventGroupEsimecuResponse> groups, Predicate<? super EventGroupEsimecuResponse> predicate) {
             return groups.stream()
                     .filter(predicate)
                     .collect(Collectors.toList());
     }
 
-    private Map<String, List<EventGroupEsimecuResponse>> findEntriesOfLaboratoryAndGroupFromTemporalGroups(LaboratoryEntity laboratory, String groupName) throws NoSuchElementException {
-        final var entries = this.findEntriesOfLaboratoryAndGroup(this.temporalGroups, laboratory, groupName);
-        if(entries == null || entries.isEmpty())
-            throw new NoSuchElementException(
-                    "No se encontraron asignaturas del semestre "
-                    + currentSemester.getSemesterId()
-                    + ", para el " + laboratory.getName()
-                    + " y con grupo en el " + groupName
-                    + " :: Inicio | fin del semestre: " + "[" + currentSemester.getStartDate() + " | " + currentSemester.getEndDate() + "]");
-        return entries;
-    }
-
-    private Map<String, List<EventGroupEsimecuResponse>> findEntriesOfLaboratoryAndGroup(Map<String, List<EventGroupEsimecuResponse>> responses, LaboratoryEntity laboratory, String groupName) {
+    public Map<String, List<EventGroupEsimecuResponse>> findEntriesOfLaboratoryAndGroup(Map<String, List<EventGroupEsimecuResponse>> responses, LaboratoryEntity laboratory, Optional<String> groupName) {
         return responses.values()
                         .stream()
                         .flatMap(Collection::stream)
                         .filter(response -> checkIfContainsLabNameOnWeek(response, laboratory.getName())
-                                    && response.getGroupName().equals(groupName))
+                                    && (groupName.isEmpty() || response.getGroupName().equals(groupName.get())))
                         .collect(Collectors.groupingBy(EventGroupEsimecuResponse::getSubjectName));
     }
 
-    private boolean checkIfContainsLabNameOnWeek(EventGroupEsimecuResponse response, String labName) {
+    public boolean checkIfContainsLabNameOnWeek(EventGroupEsimecuResponse response, String labName) {
         return response.getMonday().equals(labName)
                 || response.getTuesday().equals(labName)
                 || response.getWednesday().equals(labName)
@@ -355,7 +377,7 @@ public class SubjectService implements InitializingBean {
                 || response.getFriday().equals(labName);
     }
 
-    private List<EventGroupEsimecuResponse> retrieveSublistFromAnyValueOf(Map<String, List<EventGroupEsimecuResponse>> all, List<EventGroupEsimecuResponse> sublist) {
+    public List<EventGroupEsimecuResponse> retrieveSublistFromAnyValueOf(Map<String, List<EventGroupEsimecuResponse>> all, List<EventGroupEsimecuResponse> sublist) {
         List<EventGroupEsimecuResponse> retrieves = new ArrayList<>();
         for(final var entry : all.entrySet())
             if(entry.getValue().stream().anyMatch(sublist::contains))
@@ -364,6 +386,31 @@ public class SubjectService implements InitializingBean {
         if(retrieves.isEmpty())
             throw new PropertyNotFoundException("Naaah, error");
         return retrieves;
+    }
+
+    public Stream<EventGroupEsimecuResponse> getFilteredCoursesStream(Map<String, List<EventGroupEsimecuResponse>> all) {
+        return all.values()
+                .stream()
+                .map(value -> findFirstOptionalGroupResponseFiltered(value, res -> res.getType().equals(EsimeCuTypeEnumResponse.T)))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .sorted(Comparator.comparing(EventGroupEsimecuResponse::getGroupName))
+                .distinct();
+    }
+
+    public List<GroupDTO> getGroupsOfLaboratoryFromEsimeCuApi(LaboratoryEntity laboratory) {
+        return findEntriesOfLaboratoryAndGroupFromTemporalGroups(laboratory, null)
+                .values()
+                .stream()
+                .flatMap(Collection::stream)
+                .sorted(Comparator.comparing(EventGroupEsimecuResponse::getGroupName))
+                .map(result -> GroupDTO.builder()
+                        .subjectLabId(0)
+                        .subjectId(0)
+                        .groupName(result.getGroupName() + " - " + (laboratory.getName()))
+                        .build())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public List<EventGroupEsimecuResponse>  getBodyOfEsimeCuApiAndRequireNotNull() {

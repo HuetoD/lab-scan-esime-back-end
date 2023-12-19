@@ -9,6 +9,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.GeneratedValue;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import jakarta.persistence.Column;
@@ -32,7 +33,7 @@ public class AttendanceEntity {
     private int attendanceId;
 
     @Column(name = "fecha")
-    private LocalDate date;
+    private LocalDateTime date;
 
     @Column(name = "asistencia")
     private boolean attendance;

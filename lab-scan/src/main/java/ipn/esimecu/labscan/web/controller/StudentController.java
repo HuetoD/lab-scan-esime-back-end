@@ -2,8 +2,8 @@ package ipn.esimecu.labscan.web.controller;
 
 import ipn.esimecu.labscan.dto.GroupDTO;
 import ipn.esimecu.labscan.dto.LaboratoryDTO;
+import ipn.esimecu.labscan.dto.StudentBaseDTO;
 import ipn.esimecu.labscan.dto.StudentDTO;
-import ipn.esimecu.labscan.dto.request.StudentRequest;
 import ipn.esimecu.labscan.dto.request.TransferRequest;
 import ipn.esimecu.labscan.dto.response.SemesterResponse;
 import ipn.esimecu.labscan.service.CommonService;
@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -32,6 +33,11 @@ public class StudentController {
     public StudentController(StudentService studentService, CommonService commonService) {
         this.studentService = studentService;
         this.commonService = commonService;
+    }
+
+    @GetMapping("ping")
+    public ResponseEntity<String> pong() {
+        return ResponseEntity.ok("Pong :: Student :: " + LocalDateTime.now());
     }
 
     @GetMapping("get-labs")
@@ -51,26 +57,36 @@ public class StudentController {
         return ResponseEntity.ok(commonService.getGroups(laboratory, semester, date));
     }
 
+    @GetMapping("get-groups-of-the-week")
+    public ResponseEntity<List<GroupDTO>> getGroupsOfTheWeek(@RequestParam String laboratory,
+                                                             @RequestParam int semester) {
+        return ResponseEntity.ok(commonService.getGroupsOfTheWeek(laboratory, semester));
+    }
+
     @GetMapping("load-all-identifiers")
     public ResponseEntity<List<String>> getIdentifiers() {
         return ResponseEntity.ok(commonService.loadAllIdentifiers());
     }
 
 
-    @GetMapping("find-student")
+    @GetMapping("find-student-by-qr")
     public ResponseEntity<StudentDTO> findStudent(@RequestParam("qr_code") String qrCode) {
         return ResponseEntity.ok(studentService.findStudent(qrCode));
     }
 
+    @GetMapping("find-student-by-report-number")
+    public ResponseEntity<StudentDTO> findStudentByReportNumber(@RequestParam String reportNumber) {
+        return ResponseEntity.ok(studentService.findStudentByReportNumber(reportNumber));
+    }
+
     @PostMapping("save-student")
-    public ResponseEntity<String> saveStudent(@RequestBody @Valid StudentRequest request) {
-        studentService.save(request);
+    public ResponseEntity<StudentBaseDTO> saveStudent(@RequestBody @Valid StudentDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                             .body("Nuevo estudiante creado");
+                             .body(studentService.save(request));
     }
 
     @PutMapping("update-student")
-    public ResponseEntity<String> updateStudent(@RequestBody @Valid StudentRequest request) {
+    public ResponseEntity<String> updateStudent(@RequestBody @Valid StudentDTO request) {
         studentService.update(request);
         return ResponseEntity.ok("Se ha actualizado al estudiante: ".concat(request.getStudentFullName()));
     }

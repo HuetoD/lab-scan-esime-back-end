@@ -9,4 +9,6 @@ public interface StudentRepository extends JpaRepository<StudentEntity, Integer>
 
     Optional<StudentEntity> findByQrCode(String qrCode);
 
+    Optional<StudentEntity> findByIdentification(String identification);
+
 }

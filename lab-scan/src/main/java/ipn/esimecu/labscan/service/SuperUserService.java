@@ -15,6 +15,7 @@ import ipn.esimecu.labscan.repository.RoleUserRepository;
 import ipn.esimecu.labscan.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,13 +29,15 @@ public class SuperUserService {
     private final RoleRepository roleRepository;
     private final RoleUserRepository roleUserRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public SuperUserService(UserRepository userRepository, RoleRepository roleRepository, RoleUserRepository roleUserRepository, UserMapper userMapper) {
+    public SuperUserService(UserRepository userRepository, RoleRepository roleRepository, RoleUserRepository roleUserRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.roleUserRepository = roleUserRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
@@ -47,7 +50,7 @@ public class SuperUserService {
         existsEmail(adminDTO.getEmail());
         UserEntity user = new UserEntity();
         user.setEmail(adminDTO.getEmail());
-        user.setPassword(adminDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(adminDTO.getPassword()));
         user = userRepository.save(user);
         RoleEntity role = roleRepository.findByRoleName(Role.ADMIN)
                                         .orElseThrow(() -> new RoleNotFoundException("No exite el rol de tipo: ".concat(Role.ADMIN.toString())));

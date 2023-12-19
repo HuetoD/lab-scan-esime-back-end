@@ -13,6 +13,8 @@ public class SubjectLabNameResultDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private int subjectLabId;
+
     private int subjectId;
 
     private String groupName;

@@ -1,12 +1,13 @@
 package ipn.esimecu.labscan.service;
 
-import ipn.esimecu.labscan.dto.StudentDTO;
+import ipn.esimecu.labscan.dto.StudentBaseDTO;
 import ipn.esimecu.labscan.exception.DaeServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -21,7 +22,7 @@ public class DaeService {
 
     private HtmlPage page;
 
-    public StudentDTO findStudent(String qrCode) throws DaeServiceException {
+    public StudentBaseDTO findStudent(String qrCode) throws DaeServiceException {
         try (final WebClient webClient = new WebClient()) {
             webClient.getOptions().setThrowExceptionOnScriptError(false);
             webClient.getOptions().setCssEnabled(false);
@@ -29,25 +30,29 @@ public class DaeService {
 
             page = webClient.getPage(DAE_SERVICE_URL.concat(qrCode));
 
+            final Function<String, DaeServiceException> daeExceptionFunc = message -> new DaeServiceException(message, false);
+
             if(getFirstDivByClassName("wrapper") != null)
-                throw new DaeServiceException("Sello inexistente");
+                throw daeExceptionFunc.apply("Sello inexistente");
 
-            StudentDTO studentDTO = new StudentDTO();
-            studentDTO.setStudentId(0);
-            studentDTO.setStudentFullName(getFirstDivByClassName("nombre").getTextContent());
-            studentDTO.setStudentPcNumber("");
-            studentDTO.setStudentReportNumber(getFirstDivByClassName("boleta").getTextContent());
-            studentDTO.setStudentQrCode(qrCode);
+            StudentBaseDTO studentBaseDTO = new StudentBaseDTO();
+            studentBaseDTO.setStudentId(0);
+            studentBaseDTO.setStudentFullName(getFirstDivByClassName("nombre").orElseThrow(() -> daeExceptionFunc.apply("Nombre inexsitente"))
+                                                                              .getTextContent());
+            studentBaseDTO.setStudentPcNumber("");
+            studentBaseDTO.setStudentReportNumber(getFirstDivByClassName("boleta").orElseThrow(() -> daeExceptionFunc.apply("Boleata inexistente"))
+                                                                                  .getTextContent());
+            studentBaseDTO.setStudentQrCode(qrCode);
 
-            return studentDTO;
+            return studentBaseDTO;
         } catch (FailingHttpStatusCodeException | IOException e) {
             throw new DaeServiceException(e);
         }
     }
 
-    private DomElement getFirstDivByClassName(String name) {
+    private Optional<DomElement> getFirstDivByClassName(String name) {
         final List<DomElement> elements = page.getByXPath("//div[contains(@class, '" + name + "')]");
-        return elements == null || elements.isEmpty() ? null : elements.get(0);
+        return Optional.ofNullable(elements == null || elements.isEmpty() ? null : elements.get(0));
     }
 
 }

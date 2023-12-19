@@ -1,5 +1,6 @@
 package ipn.esimecu.labscan.services;
 
+import ipn.esimecu.labscan.dto.GroupDTO;
 import ipn.esimecu.labscan.dto.response.EsimeCuTypeEnumResponse;
 import ipn.esimecu.labscan.dto.response.EventGroupEsimecuResponse;
 import ipn.esimecu.labscan.entity.CourseEntity;
@@ -7,6 +8,7 @@ import ipn.esimecu.labscan.entity.LaboratoryEntity;
 import ipn.esimecu.labscan.entity.SubjectEntity;
 import ipn.esimecu.labscan.entity.TeacherEntity;
 import ipn.esimecu.labscan.repository.LaboratoryRepository;
+import ipn.esimecu.labscan.service.CommonService;
 import ipn.esimecu.labscan.service.SubjectService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -33,11 +38,14 @@ public class SubjectServiceTest {
 
     private final SubjectService subjectService;
 
+    private final CommonService commonService;
+
     private final LaboratoryRepository laboratoryRepository;
 
     @Autowired
-    public SubjectServiceTest(SubjectService subjectService, LaboratoryRepository laboratoryRepository) {
+    public SubjectServiceTest(SubjectService subjectService, CommonService commonService, LaboratoryRepository laboratoryRepository) {
         this.subjectService = subjectService;
+        this.commonService = commonService;
         this.laboratoryRepository = laboratoryRepository;
     }
 
@@ -118,5 +126,50 @@ public class SubjectServiceTest {
         Assertions.assertDoesNotThrow(() -> subjectRef.set(subjectService.create(semester, laboratory.get(), "6CV15")));
         Assertions.assertEquals("INGENIERA DE SOFTWARE", subjectRef.get().getCourse().getCourseName());
         log.info(subjectRef.get().getSchedules().toString());
+    }
+
+    @Disabled
+    @Test
+    @Order(10)
+    public void foo() {
+       /* var courses = subjectService.getFilteredCoursesStream(subjectService.getTemporalGroups());
+
+        if(courses.count() > subjectService.countAllCourses()) {
+            courses.filter(course -> !subjectService.existsCourseByName(course.getSubjectName()));
+
+        }*/
+
+        int semester = 24;
+        LaboratoryEntity laboratory = new LaboratoryEntity();
+        laboratory.setName("Lab. Computación 2");
+        var x = subjectService.findEntriesOfLaboratoryAndGroupFromTemporalGroups(laboratory, null);
+        var y = x.values()
+                            .stream()
+                            .flatMap(Collection::stream)
+                            .sorted(Comparator.comparing(EventGroupEsimecuResponse::getGroupName))
+                            .map(result -> GroupDTO.builder()
+                                    .subjectLabId(0)
+                                    .subjectId(0)
+                                    .groupName(result.getGroupName() + " - " + (laboratory.getName()))
+                                    .build())
+                            .distinct()
+                            .collect(Collectors.toList());
+
+        commonService.getGroupsOfTheWeek(laboratory.getName(), semester).forEach(groupDTO -> {
+            y.stream()
+             .filter(value -> value.getGroupName().equals(groupDTO.getGroupName()))
+             .findFirst()
+             .ifPresent(found -> {
+                found.setSubjectId(groupDTO.getSubjectId());
+                found.setSubjectLabId(groupDTO.getSubjectLabId());
+             });
+        });
+
+        System.out.println(y);
+
+
+
+        /*subjectService.getTemporalGroups()
+                      .forEach((key, value) -> subjectService.findCourseOrCreate(value));*/
     }
 }
