@@ -21,10 +21,7 @@ public class Config {
         return executor;
     }
 
-    @Bean
-    public JavaMailSender javaMailSenderBean() {
-        return new JavaMailSenderImpl();
-    }
+    
 
 
 }

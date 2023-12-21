@@ -20,6 +20,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import static java.lang.System.setOut;
+
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -52,10 +54,10 @@ public class SecurityConfig {
                                         .anyRequest()
                                         .authenticated()
                 .and()
-                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling().accessDeniedHandler(accessDeniedHandler)
                 .authenticationEntryPoint(http403ForbiddenEntryPoint)
                 .and()
+                .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -81,6 +83,8 @@ public class SecurityConfig {
         return new Http403ForbiddenEntryPoint() {
             @Override
             public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException arg2) throws IOException {
+                System.out.println("Error in 403");
+                System.out.println(arg2.getLocalizedMessage());;
                 SecurityConstant.handleUnauthorized(response);
             }
 

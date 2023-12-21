@@ -13,8 +13,8 @@ import ipn.esimecu.labscan.mapper.UserMapper;
 import ipn.esimecu.labscan.repository.RoleRepository;
 import ipn.esimecu.labscan.repository.RoleUserRepository;
 import ipn.esimecu.labscan.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,22 +23,15 @@ import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class SuperUserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final RoleUserRepository roleUserRepository;
     private final UserMapper userMapper;
+    private final MailService mailService;
     private final PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public SuperUserService(UserRepository userRepository, RoleRepository roleRepository, RoleUserRepository roleUserRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.roleUserRepository = roleUserRepository;
-        this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Transactional(readOnly = true)
     public List<AdminResponse> loadAdmins() {
@@ -62,11 +55,14 @@ public class SuperUserService {
 
     @Transactional
     public AdminResponse updateAdmin(AdminDTO request) throws EmailExistsException {
-        existsEmail(request.getEmail());
         UserEntity user = userRepository.findById(request.getAdminId())
                                         .orElseThrow(UserNotFoundException::new);
-        user.setPassword(request.getPassword());
+        if(!request.getEmail().equals(user.getEmail())) 
+            existsEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
+        userRepository.save(user);
+        log.info(mailService.sendSyncNewPassword(user.getEmail(), request.getPassword()));
         return userMapper.map(user);
     }
 
@@ -76,11 +72,8 @@ public class SuperUserService {
     }
 
     public void existsEmail(String email) throws EmailExistsException {
-        if(userRepository.findByEmail(email).isPresent()) {
-            log.error("Email existente: ".concat(email));
-            throw new EmailExistsException();
-        }
-        log.info("No existe el email: ".concat(email));
+        if(userRepository.findByEmail(email).isPresent()) 
+            throw new EmailExistsException("Correo existente: " + email);
     }
 
     @Override

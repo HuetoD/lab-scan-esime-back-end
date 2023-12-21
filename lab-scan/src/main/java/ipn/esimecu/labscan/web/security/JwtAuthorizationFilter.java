@@ -51,6 +51,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 if(isTokenValid &&  isAuthNull) {
                     List<GrantedAuthority> authorities = jwtTokenProvider.getAuthorities(token);
                     Authentication authentication = jwtTokenProvider.getAuthentication(username, authorities, request);
+                    System.out.println("Is authenticated: " + authentication.isAuthenticated());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
                     SecurityContextHolder.clearContext();

@@ -5,7 +5,6 @@ import ipn.esimecu.labscan.dto.LaboratoryDTO;
 import ipn.esimecu.labscan.dto.response.SemesterResponse;
 import ipn.esimecu.labscan.entity.IdentificationTypeEntity;
 import ipn.esimecu.labscan.entity.LaboratoryEntity;
-import ipn.esimecu.labscan.entity.SemesterEntity;
 import ipn.esimecu.labscan.entity.constant.Day;
 import ipn.esimecu.labscan.mapper.LaboratoryMapper;
 import ipn.esimecu.labscan.mapper.SemesterMapper;
@@ -102,13 +101,6 @@ public class CommonService {
                                         .stream()
                                         .map(IdentificationTypeEntity::getIdentificationType)
                                         .collect(Collectors.toList());
-    }
-
-    private boolean createGroupsAndTheirCourses(LaboratoryEntity laboratory, int semesterId) {
-
-
-
-        return false;
     }
 
 }

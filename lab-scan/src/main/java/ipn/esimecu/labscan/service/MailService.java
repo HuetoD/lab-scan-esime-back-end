@@ -3,6 +3,8 @@ package ipn.esimecu.labscan.service;
 import ipn.esimecu.labscan.exception.UnsentMailException;
 import ipn.esimecu.labscan.web.Config;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,6 +18,7 @@ import org.thymeleaf.exceptions.TemplateProcessingException;
 
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MailService {
@@ -26,6 +29,9 @@ public class MailService {
 
     @Value("${spring.mail.username}")
     private String from;
+
+    @Value("${spring.mail.port}")
+    private int port;
 
     private final String SUBJECT = "Lab Scan Esime - Solicitud de cambio de contraseña";
 
@@ -39,6 +45,10 @@ public class MailService {
     }
 
     protected String sendNewPassword(String email, String newPassword) throws UnsentMailException {
+        log.info("PORT = " + port);
+        log.info("from = " + from);
+        log.info("email = " + email);
+        log.info("newPassword = " + newPassword);
         try {
             final String html = loadTemplate(newPassword);
             MimeMessagePreparator mimeMessagePreparator = mimeMessage -> {

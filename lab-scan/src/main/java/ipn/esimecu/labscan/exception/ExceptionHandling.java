@@ -100,4 +100,13 @@ public class ExceptionHandling {
                         .build());
     }
 
+    @ExceptionHandler(EmailExistsException.class)
+    public ResponseEntity<ErrorResponse> emailExistsExceptionHandler(EmailExistsException exception) {
+        return ResponseEntity.badRequest()
+                .body(ErrorResponse.builder()
+                        .message("Correo duplicado")
+                        .details(exception.getMessage())
+                        .build());
+    }
+
 }

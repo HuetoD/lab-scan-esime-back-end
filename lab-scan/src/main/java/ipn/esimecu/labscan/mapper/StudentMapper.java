@@ -7,6 +7,8 @@ import ipn.esimecu.labscan.entity.GroupEntity;
 import ipn.esimecu.labscan.entity.LaboratoryEntity;
 import ipn.esimecu.labscan.entity.StudentEntity;
 import ipn.esimecu.labscan.entity.SubjectEntity;
+import lombok.val;
+
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class StudentMapper implements SuperMapper<StudentEntity, StudentBaseDTO> {
@@ -87,6 +90,11 @@ public class StudentMapper implements SuperMapper<StudentEntity, StudentBaseDTO>
                     if (dto.getSemesterId() == -1)
                         dto.setSemesterId(subject.getSemester().getSemesterId());
                 });
+        groups.forEach((key, value) -> {
+            final List<GroupDTO> distinct = value.stream().distinct().collect(Collectors.toList());
+            value.clear();
+            value.addAll(distinct);
+        });
         dto.setSemesterId(dto.getSemesterId() == -1 ? 0 : dto.getSemesterId());
         dto.setGroups(groups);
         return dto;

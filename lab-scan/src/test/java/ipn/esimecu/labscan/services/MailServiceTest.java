@@ -24,7 +24,7 @@ public class MailServiceTest {
     @Order(1)
     public void sendSyncEmailTest() {
         try {
-            mailService.sendSyncNewPassword("macero9672@anawalls.com", "campanillazo");
+            mailService.sendSyncNewPassword("xorore9923@anawalls.com", "campanillazo");
         }catch(Exception e) {
             e.printStackTrace(System.err);
         }

@@ -48,8 +48,8 @@ public class AdminService {
     private final AttendanceMapper attendanceMapper;
 
     @Transactional(readOnly = true)
-    public List<AttendanceEntity> findAttendancesByFilters(AttendanceFiltersRequest request) {
-        return attendanceRepository.findByFilter(request);
+    public List<AttendanceBaseDTO> findAttendancesByFilters(AttendanceFiltersRequest request) {
+        return attendanceMapper.mapAllDTOs(attendanceRepository.findByFilter(request));
     }
 
     @Transactional(readOnly = true)

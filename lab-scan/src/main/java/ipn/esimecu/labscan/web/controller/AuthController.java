@@ -44,9 +44,8 @@ public class AuthController {
     }
 
     @PutMapping("reset-password")
-    public Future<ResponseEntity<String>> resetPassword(@RequestBody LoginRequest request) {
-        return authService.resetPassword(request.getEmail(), request.getPassword())
-                          .thenApply(ResponseEntity::ok);
+    public ResponseEntity<String> resetPassword(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.resetPassword(request.getEmail(), request.getPassword()));
     }
 
     @GetMapping("encode-password")

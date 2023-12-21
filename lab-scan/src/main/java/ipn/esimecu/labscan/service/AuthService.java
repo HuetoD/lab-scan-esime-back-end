@@ -42,15 +42,16 @@ public class AuthService {
         return jwtTokenProvider.generateJwtToken(userDetails);
     }
 
-    public CompletableFuture<String> resetPassword(String email, String newPassword) throws UnsentMailException {
+    public String resetPassword(String email, String newPassword) throws UnsentMailException {
         final UserEntity user = userRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
-        return mailService.sendAsyncNewPassword(
+        String password = mailService.sendSyncNewPassword(
                 user.getEmail(),
                 Optional.ofNullable(newPassword).orElse(Util.randomString(6).toUpperCase())
-        ).thenApply(password -> {
-            user.setPassword(passwordEncoder.encode(password));
-            return "La nueva contraseña ha sido enviada a " + email;
-        });
+        );
+        
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        return "La nueva contraseña ha sido enviada a " + email;
     }
 
 }
