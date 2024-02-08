@@ -1,7 +1,12 @@
 package ipn.esimecu.labscan.exception;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ipn.esimecu.labscan.dto.response.ErrorResponse;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.util.IO;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
@@ -9,17 +14,28 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Optional;
 
 @RestControllerAdvice
 public class ExceptionHandling {
 
-    private static final String METHOD_ARGUMENT_NOT_VALID = "Error de validación";
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String INTERNAL_SERVER_ERROR = "Ha ocurrido un error en el servidor";
-    private static final String BAD_CREDENTIALS = "Correo o contraseña incorrecta";
-    private static final String BAD_CREDENTIALS_DETAILS = "Verifique que su correo o contraseña esté bien escrito.";
-    private static final String UNKNOWN = "Desconocido";
+    public static final String METHOD_ARGUMENT_NOT_VALID = "Error de validación";
+
+    public static final String INTERNAL_SERVER_ERROR = "Ha ocurrido un error en el servidor";
+    public static final String BAD_CREDENTIALS = "Correo o contraseña incorrecta";
+    public static final String BAD_CREDENTIALS_DETAILS = "Verifique que su correo o contraseña esté bien escrito.";
+    public static final String UNKNOWN = "Desconocido";
+
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<ErrorResponse> handleThrowable(Throwable throwable) {
+        throwable.printStackTrace(System.err);
+        return ResponseEntity.internalServerError()
+                            .body(buildInternalServerError(throwable));
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> methodArgumentNotValidHandler(MethodArgumentNotValidException exception) {
@@ -57,6 +73,7 @@ public class ExceptionHandling {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> entityNotFoundExceptionHandler(EntityNotFoundException exception) {
+        exception.printStackTrace(System.err);
         return ResponseEntity.unprocessableEntity()
                              .body(
                                      ErrorResponse.builder()
@@ -68,6 +85,7 @@ public class ExceptionHandling {
 
     @ExceptionHandler(StudentNotFoundException.class)
     public ResponseEntity<ErrorResponse> studentNotFoundExceptionHandler(StudentNotFoundException exception) {
+        exception.printStackTrace(System.err);
         return ResponseEntity.badRequest()
                             .body(ErrorResponse.builder()
                                             .message("Error al buscar informacion del estudiante")
@@ -107,6 +125,29 @@ public class ExceptionHandling {
                         .message("Correo duplicado")
                         .details(exception.getMessage())
                         .build());
+    }
+
+    public static void handle(HttpServletResponse response, ErrorResponse error, HttpStatus status) throws IOException {
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(status.value());
+        OutputStream outputStream = response.getOutputStream();
+        objectMapper.writeValue(outputStream, error);
+        outputStream.flush();
+    }
+
+    public static void handleInternalServerError(HttpServletResponse response, Exception exception) throws IOException {
+        handle(response, buildInternalServerError(exception), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    public static void handleUnauthorized(HttpServletResponse response) throws IOException {
+        handle(response, ErrorResponse.builder()
+                .message("Debes iniciar sesión")
+                .details("No estás autorizado para acceder a este recurso")
+                .build(), HttpStatus.UNAUTHORIZED);
+    }
+
+    public static ErrorResponse buildInternalServerError(Throwable throwable) {
+        return ErrorResponse.builder().message(INTERNAL_SERVER_ERROR).details("Error de tipo: " + throwable.getClass().getSimpleName()).build();
     }
 
 }

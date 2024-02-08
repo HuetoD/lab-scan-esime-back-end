@@ -27,13 +27,13 @@ public class AttendanceMapper implements SuperMapper<AttendanceEntity, Attendanc
     public AttendanceBaseDTO map(AttendanceEntity entity) {
         AttendanceBaseDTO response = map(entity.getStudent());
         response.setAttendanceId(entity.getAttendanceId());
-        response.setSubjectId(entity.getSubject().getSubjectId());
+        response.setSubjectLabId(entity.getSubjectLab().getId());
         response.setObservations(entity.getObservation());
         response.setAttendance(entity.isAttendance());
         return response;
     }
 
     public AttendanceBaseDTO map(StudentEntity student) {
-        return (AttendanceBaseDTO) studentMapper.map(student);
+        return (AttendanceBaseDTO) studentMapper.withSupplier(AttendanceBaseDTO::new).map(student);
     }
 }

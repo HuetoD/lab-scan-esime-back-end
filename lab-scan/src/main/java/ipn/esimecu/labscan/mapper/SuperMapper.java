@@ -3,6 +3,7 @@ package ipn.esimecu.labscan.mapper;
 import java.io.Serializable;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public interface SuperMapper<E, DTO extends Serializable> {

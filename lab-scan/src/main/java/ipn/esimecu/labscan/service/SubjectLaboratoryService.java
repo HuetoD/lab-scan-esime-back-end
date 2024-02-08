@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ public class SubjectLaboratoryService {
     private final SubjectLaboratoryRepository subjectLaboratoryRepository;
 
     @Transactional
-    public <AnyCollection extends Collection<SubjectEntity>> void saveWithPersistedSubjects(Map<LaboratoryEntity, AnyCollection> labSubjectsMap, AnyCollection persistedSubjects) {
+    public <AnyCollection extends Collection<SubjectEntity>> List<SubjectLaboratoryEntity> saveWithPersistedSubjects(Map<LaboratoryEntity, AnyCollection> labSubjectsMap, AnyCollection persistedSubjects) {
         final List<SubjectLaboratoryEntity> subjectLabEntities = new ArrayList<>(persistedSubjects.size());
         labSubjectsMap.forEach((lab, subjects) -> {
             subjects.forEach(subject -> {
@@ -31,7 +32,7 @@ public class SubjectLaboratoryService {
                 entity.setLaboratory(lab);
                 entity.setSubject(
                         persistedSubjects.stream()
-                                .filter(persisted -> isEqualSubject(persisted, subject))
+                                .filter(persisted -> this.isEqualSubject(persisted, subject))
                                 .findFirst()
                                 .orElseThrow(() -> new EntityNotFoundException("No se ha creado una asignatura de nombre: " + subject.getCourse().getCourseName()))
                 );
@@ -39,12 +40,15 @@ public class SubjectLaboratoryService {
             });
         });
 
-        subjectLaboratoryRepository.saveAll(subjectLabEntities);
+        return subjectLaboratoryRepository.saveAll(subjectLabEntities);
+    }
+
+    public Optional<SubjectLaboratoryEntity> findById(int id) {
+        return this.subjectLaboratoryRepository.findById(id);
     }
 
     private boolean isEqualSubject(SubjectEntity subject, SubjectEntity another) {
         return subject.getGroup().equals(another.getGroup())
-                && subject.getSchedules().equals(another.getSchedules())
                 && subject.getCourse().equals(another.getCourse())
                 && subject.getSemester().equals(another.getSemester())
                 && subject.getTeacher().equals(another.getTeacher());

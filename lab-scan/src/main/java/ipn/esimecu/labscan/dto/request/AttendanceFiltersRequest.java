@@ -21,6 +21,8 @@ public class AttendanceFiltersRequest implements Serializable {
 
     private int semester;
 
+    private int subjectId;
+
     private int subjectLabId;
 
     private String likeStudentName;

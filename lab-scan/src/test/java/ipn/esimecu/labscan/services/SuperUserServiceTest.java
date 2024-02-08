@@ -6,7 +6,7 @@ import ipn.esimecu.labscan.exception.EmailExistsException;
 import ipn.esimecu.labscan.exception.RoleNotFoundException;
 import ipn.esimecu.labscan.exception.UserNotFoundException;
 import ipn.esimecu.labscan.service.SuperUserService;
-import ipn.esimecu.labscan.repository.util.Util;
+import ipn.esimecu.labscan.util.Util;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;

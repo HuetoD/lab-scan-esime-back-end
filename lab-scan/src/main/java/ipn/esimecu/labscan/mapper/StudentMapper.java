@@ -7,8 +7,8 @@ import ipn.esimecu.labscan.entity.GroupEntity;
 import ipn.esimecu.labscan.entity.LaboratoryEntity;
 import ipn.esimecu.labscan.entity.StudentEntity;
 import ipn.esimecu.labscan.entity.SubjectEntity;
-import lombok.val;
 
+import ipn.esimecu.labscan.entity.SubjectLaboratoryEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -16,10 +16,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
-public class StudentMapper implements SuperMapper<StudentEntity, StudentBaseDTO> {
+public class StudentMapper extends Mapper<StudentEntity, StudentBaseDTO> {
 
     @Override
     public StudentEntity map(StudentBaseDTO studentBaseDTO) {
@@ -32,8 +31,7 @@ public class StudentMapper implements SuperMapper<StudentEntity, StudentBaseDTO>
     }
 
     @Override
-    public StudentBaseDTO map(StudentEntity entity) {
-        StudentBaseDTO response = new StudentBaseDTO();
+    protected StudentBaseDTO internalMap(StudentEntity entity, StudentBaseDTO response) {
         response.setStudentId(entity.getStudentId());
         response.setStudentPcNumber(entity.getPcNumber());
         response.setStudentReportNumber(entity.getIdentification());
@@ -41,6 +39,11 @@ public class StudentMapper implements SuperMapper<StudentEntity, StudentBaseDTO>
         response.setStudentFullName(entity.getFullName());
         response.setStudentIdentificationType(entity.getIdentificationType().getIdentificationType());
         return response;
+    }
+
+    @Override
+    protected void initSuppliers() {
+        this.temporalDtoSupplier = this.dtoSupplier = StudentBaseDTO::new;
     }
 
     public StudentEntity map(StudentDTO request, StudentEntity source) {
@@ -73,27 +76,22 @@ public class StudentMapper implements SuperMapper<StudentEntity, StudentBaseDTO>
         dto.setStudentIdentificationType(entity.getIdentificationType().getIdentificationType());
         dto.setSacademRegisterDate(entity.getSacademDate());
         dto.setPhoto(Optional.ofNullable(entity.getPhoto()).map(Object::toString).orElse(null)); // WRONG
-        entity.getStudentSubjects().stream().flatMap(s -> s.getSubject().getSubjectLaboratories().stream())
-                .forEach(subjectLab -> {
-                    LaboratoryEntity laboratory = subjectLab.getLaboratory();
-                    SubjectEntity subject = subjectLab.getSubject();
-                    GroupEntity groupEntity = subject.getGroup();
-                    final String key = laboratory.getName();
-                    if (!groups.containsKey(key))
-                        groups.put(key, new ArrayList<>());
-                    groups.get(key).add(GroupDTO.builder()
-                            .groupName(groupEntity.getName() + " - " + key)
-                            .subjectId(subject.getSubjectId())
-                            .subjectLabId(subjectLab.getLaboratory().getLaboratoryId())
-                            .build());
+        entity.getStudentSubjects().forEach(studentSubject -> {
+            final SubjectLaboratoryEntity subjectLab = studentSubject.getSubjectLab();
+            LaboratoryEntity laboratory = subjectLab.getLaboratory();
+            SubjectEntity subject = subjectLab.getSubject();
+            GroupEntity groupEntity = subject.getGroup();
+            final String key = laboratory.getName();
+            if (!groups.containsKey(key))
+                groups.put(key, new ArrayList<>());
+            groups.get(key).add(GroupDTO.builder()
+                    .groupName(groupEntity.getName() + " - " + key)
+                    .subjectId(subject.getSubjectId())
+                    .subjectLabId(subjectLab.getLaboratory().getLaboratoryId())
+                    .build());
 
-                    if (dto.getSemesterId() == -1)
-                        dto.setSemesterId(subject.getSemester().getSemesterId());
-                });
-        groups.forEach((key, value) -> {
-            final List<GroupDTO> distinct = value.stream().distinct().collect(Collectors.toList());
-            value.clear();
-            value.addAll(distinct);
+            if (dto.getSemesterId() == -1)
+                dto.setSemesterId(subject.getSemester().getSemesterId());
         });
         dto.setSemesterId(dto.getSemesterId() == -1 ? 0 : dto.getSemesterId());
         dto.setGroups(groups);

@@ -32,12 +32,12 @@ public class AdminServiceTest {
     public void findAttendancesByFiltersTest() {
         final AttendanceFiltersRequest filters = AttendanceFiltersRequest.builder()
                                                                          .semester(24)
-                                                                         .subjectLabId(3)
+                                                                         .subjectLabId(0)
                                                                          .likeStudentName(null)
                                                                          .start(LocalDate.now().minusMonths(3))
                                                                          .end(LocalDate.now())
                                                                          .build();
-        Assertions.assertDoesNotThrow(() -> adminService.findAttendancesByFilters(filters));
+        Assertions.assertDoesNotThrow(() -> log.info(adminService.findAttendancesByFilters(filters).toString()));
     }
 
 }

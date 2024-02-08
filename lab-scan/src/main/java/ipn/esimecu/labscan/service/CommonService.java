@@ -2,6 +2,7 @@ package ipn.esimecu.labscan.service;
 
 import ipn.esimecu.labscan.dto.GroupDTO;
 import ipn.esimecu.labscan.dto.LaboratoryDTO;
+import ipn.esimecu.labscan.dto.SubjectLabNameResultDTO;
 import ipn.esimecu.labscan.dto.response.SemesterResponse;
 import ipn.esimecu.labscan.entity.IdentificationTypeEntity;
 import ipn.esimecu.labscan.entity.LaboratoryEntity;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -66,6 +68,27 @@ public class CommonService {
     }
 
     @Transactional(readOnly = true)
+    public List<SubjectLabNameResultDTO> getGroupsBySemester(int semester) {
+        return subjectLaboratoryRepository.findBySemester(semester)
+                                        .stream()
+                                        .map(dto -> new SubjectLabNameResultDTO(dto) {
+                                                @Override
+                                                public boolean equals(Object o) {
+                                                    if(!(o instanceof SubjectLabNameResultDTO)) return false;
+                                                    return this.getSubjectId() == ((SubjectLabNameResultDTO) o).getSubjectId();
+                                                }
+
+                                                @Override
+                                                public int hashCode() {
+                                                    return Integer.hashCode(this.getSubjectId());
+                                                }
+                                        })
+                                        .distinct()
+                                        .collect(Collectors.toList());
+
+    }
+
+    @Transactional(readOnly = true)
     public List<GroupDTO> getGroups(String laboratory, int semester, LocalDate date) {
         return getGroups(laboratory, semester, Day.of(date));
     }
@@ -77,11 +100,7 @@ public class CommonService {
 
         subjectLaboratoryRepository.findGroupLabNamesByDayAndSemester(laboratory, semester, day.value())
                 .stream()
-                .map(result -> GroupDTO.builder()
-                        .subjectLabId(result.getSubjectLabId())
-                        .subjectId(result.getSubjectId())
-                        .groupName(result.getGroupName().concat(" - ").concat(result.getLabName()))
-                        .build())
+                .map(GroupDTO::to)
                 .forEach(groupDTO -> {
                     groups.stream()
                           .filter(value -> value.getGroupName().equals(groupDTO.getGroupName()))

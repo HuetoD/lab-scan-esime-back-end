@@ -2,7 +2,9 @@ package ipn.esimecu.labscan.service;
 
 import ipn.esimecu.labscan.dto.AttendanceBaseDTO;
 import ipn.esimecu.labscan.entity.SubjectEntity;
-import ipn.esimecu.labscan.repository.util.Util;
+import ipn.esimecu.labscan.exception.InsufficientRoomsException;
+import ipn.esimecu.labscan.util.Util;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -15,11 +17,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 @Service
+@Slf4j
 public class WebSocketManagerService {
 
-    public final Map<RoomMetadata, Set<AttendanceBaseDTO>> metadata = new HashMap<>();
-
+    private final int MAX_ROOMS = 99_999;
     private static int sequence = 0;
+
+    public final Map<RoomMetadata, Set<AttendanceBaseDTO>> metadata = new HashMap<>();
 
     public String addAttendance(SubjectEntity subject, Collection<AttendanceBaseDTO> attendances) {
         final Map<RoomMetadata, Set<AttendanceBaseDTO>> rollBackMetadata = new HashMap<>(metadata);
@@ -65,8 +69,11 @@ public class WebSocketManagerService {
                                                 }));
     }
 
-    public void destroyRoom(int subjectId) {
+    public void destroyRoom(String room) {
+        findMetadataByRoom(room).ifPresent(roomMetadata -> {
+            metadata.get(roomMetadata).clear();
 
+        });
     }
 
     public Optional<RoomMetadata> findMetadataByRoom(String room) {
@@ -74,7 +81,7 @@ public class WebSocketManagerService {
     }
 
     private Optional<RoomMetadata> findMetadataBySubject(SubjectEntity subject) {
-        return findMetadataBy(roomMetadata -> roomMetadata.subject.equals(subject));
+        return findMetadataBy(roomMetadata -> roomMetadata.subject.getSubjectId() == subject.getSubjectId());
     }
 
     private Optional<RoomMetadata> findMetadataBy(Predicate<? super RoomMetadata> predicate) {
@@ -84,7 +91,9 @@ public class WebSocketManagerService {
                     .findFirst();
     }
 
-    private String generateNewRoom() {
+    private String generateNewRoom() throws InsufficientRoomsException {
+        if(sequence + 1 > MAX_ROOMS)
+            throw new InsufficientRoomsException("Se ha llegado al limite de asistencias simultaneas");
         return Util.randomString(4)
                 .toUpperCase()
                 .concat(String.valueOf(++sequence));

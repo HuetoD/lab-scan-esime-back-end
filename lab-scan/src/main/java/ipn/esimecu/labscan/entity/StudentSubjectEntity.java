@@ -33,7 +33,7 @@ public class StudentSubjectEntity {
     private StudentEntity student;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "asignatura_id")
-    private SubjectEntity subject;
+    @JoinColumn(name = "asignatura_lab_id")
+    private SubjectLaboratoryEntity subjectLab;
 
 }

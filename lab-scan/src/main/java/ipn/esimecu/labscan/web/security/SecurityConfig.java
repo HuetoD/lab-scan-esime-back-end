@@ -1,5 +1,6 @@
 package ipn.esimecu.labscan.web.security;
 
+import ipn.esimecu.labscan.exception.ExceptionHandling;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
@@ -42,7 +43,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    CorsConfigurationSource corsConfiguration,
                                                    JwtAuthorizationFilter jwtAuthorizationFilter,
-                                                   Http403ForbiddenEntryPoint http403ForbiddenEntryPoint,
+                                                  // Http403ForbiddenEntryPoint http403ForbiddenEntryPoint,
                                                    JwtAccessDeniedHandler accessDeniedHandler) throws Exception {
         return http.csrf()
                 .disable()
@@ -55,7 +56,6 @@ public class SecurityConfig {
                                         .authenticated()
                 .and()
                 .exceptionHandling().accessDeniedHandler(accessDeniedHandler)
-                .authenticationEntryPoint(http403ForbiddenEntryPoint)
                 .and()
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -78,17 +78,17 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
+    /*@Bean
     public Http403ForbiddenEntryPoint http403ForbiddenEntryPointBean() {
         return new Http403ForbiddenEntryPoint() {
             @Override
             public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException arg2) throws IOException {
                 System.out.println("Error in 403");
-                System.out.println(arg2.getLocalizedMessage());;
-                SecurityConstant.handleUnauthorized(response);
+                System.out.println(arg2.getStackTrace());
+                ExceptionHandling.handleInternalServerError(response, arg2);
             }
 
         };
-    }
+    }*/
 
 }

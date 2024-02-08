@@ -3,6 +3,7 @@ package ipn.esimecu.labscan.service;
 import ipn.esimecu.labscan.entity.StudentEntity;
 import ipn.esimecu.labscan.entity.StudentSubjectEntity;
 import ipn.esimecu.labscan.entity.SubjectEntity;
+import ipn.esimecu.labscan.entity.SubjectLaboratoryEntity;
 import ipn.esimecu.labscan.repository.StudentSubjectRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +25,13 @@ public class StudentSubjectService {
     }
 
     @Transactional
-    public List<StudentSubjectEntity> save(StudentEntity student, List<SubjectEntity> subjects) {
+    public List<StudentSubjectEntity> save(StudentEntity student, List<SubjectLaboratoryEntity> subjects) {
+        System.out.println("Save student | labs: " + subjects);
         return studentSubjectRepository.saveAll(
                 subjects.stream()
                         .map(subject -> {
                             StudentSubjectEntity entity = new StudentSubjectEntity();
-                            entity.setSubject(subject);
+                            entity.setSubjectLab(subject);
                             entity.setStudent(student);
                             return entity;
                         })

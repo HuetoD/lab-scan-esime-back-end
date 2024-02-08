@@ -10,6 +10,7 @@ import ipn.esimecu.labscan.entity.LaboratoryEntity;
 import ipn.esimecu.labscan.entity.ScheduleEntity;
 import ipn.esimecu.labscan.entity.SemesterEntity;
 import ipn.esimecu.labscan.entity.SubjectEntity;
+import ipn.esimecu.labscan.entity.SubjectLaboratoryEntity;
 import ipn.esimecu.labscan.entity.TeacherEntity;
 import ipn.esimecu.labscan.entity.constant.Day;
 import ipn.esimecu.labscan.repository.CourseRepository;
@@ -127,15 +128,14 @@ public class SubjectService implements InitializingBean {
     }
 
     @Transactional
-    public List<SubjectEntity> saveSubjects(StudentDTO request) {
+    public List<SubjectLaboratoryEntity> saveSubjects(StudentDTO request) {
         List<LaboratoryEntity> labsFound = this.findLaboratoriesOf(request);
-        List<SubjectEntity> subjects = new ArrayList<>();
+        List<SubjectLaboratoryEntity> subjects = new ArrayList<>();
         Set<SubjectEntity> newSubjects = new HashSet<>();
         Map<LaboratoryEntity, List<SubjectEntity>> labSubjectsMap = new HashMap<>();
         for(final var entry : request.getGroups().entrySet()) {
             for(final GroupDTO groupDTO : entry.getValue()) {
-                System.out.println("ID: " + groupDTO.getSubjectId());
-                Optional<SubjectEntity> subject = this.findById(groupDTO.getSubjectId());
+                Optional<SubjectLaboratoryEntity> subject = this.subjectLaboratoryService.findById(groupDTO.getSubjectLabId());
                 if(subject.isPresent()) {
                     subjects.add(subject.get());
                 } else {
@@ -155,9 +155,7 @@ public class SubjectService implements InitializingBean {
             }
         }
 
-        List<SubjectEntity> newSubjectsSaved = saveAll(newSubjects);
-        subjectLaboratoryService.saveWithPersistedSubjects(labSubjectsMap, newSubjectsSaved);
-        subjects.addAll(newSubjectsSaved);
+        subjects.addAll(subjectLaboratoryService.saveWithPersistedSubjects(labSubjectsMap,  saveAll(newSubjects)));
         return subjects;
     }
 

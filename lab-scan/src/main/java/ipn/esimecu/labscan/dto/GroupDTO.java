@@ -47,4 +47,12 @@ public class GroupDTO implements Serializable, Cloneable {
                     .groupName(groupName)
                     .build();
     }
+
+    public static GroupDTO to(SubjectLabNameResultDTO result) {
+        return GroupDTO.builder()
+                .subjectLabId(result.getSubjectLabId())
+                .subjectId(result.getSubjectId())
+                .groupName(result.getGroupName().concat(" - ").concat(result.getLabName()))
+                .build();
+    }
 }

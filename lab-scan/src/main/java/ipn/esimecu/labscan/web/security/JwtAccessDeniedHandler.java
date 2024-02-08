@@ -1,7 +1,10 @@
 package ipn.esimecu.labscan.web.security;
 
+import ipn.esimecu.labscan.dto.response.ErrorResponse;
+import ipn.esimecu.labscan.exception.ExceptionHandling;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
@@ -13,6 +16,6 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
-        SecurityConstant.handleUnauthorized(response);
+        ExceptionHandling.handleUnauthorized(response);
     }
 }

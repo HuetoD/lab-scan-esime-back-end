@@ -4,6 +4,7 @@ import ipn.esimecu.labscan.dto.GroupDTO;
 import ipn.esimecu.labscan.dto.LaboratoryDTO;
 import ipn.esimecu.labscan.dto.StudentBaseDTO;
 import ipn.esimecu.labscan.dto.StudentDTO;
+import ipn.esimecu.labscan.dto.SubjectLabNameResultDTO;
 import ipn.esimecu.labscan.dto.request.TransferRequest;
 import ipn.esimecu.labscan.dto.response.SemesterResponse;
 import ipn.esimecu.labscan.service.CommonService;
@@ -61,6 +62,11 @@ public class StudentController {
     public ResponseEntity<List<GroupDTO>> getGroupsOfTheWeek(@RequestParam String laboratory,
                                                              @RequestParam int semester) {
         return ResponseEntity.ok(commonService.getGroupsOfTheWeek(laboratory, semester));
+    }
+
+    @GetMapping("get-groups-by-semester/{semester}")
+    public ResponseEntity<List<SubjectLabNameResultDTO>> getGroupsBySemester(@PathVariable int semester) {
+        return ResponseEntity.ok(commonService.getGroupsBySemester(semester));
     }
 
     @GetMapping("load-all-identifiers")

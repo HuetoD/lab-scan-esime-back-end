@@ -21,4 +21,12 @@ public interface SubjectLaboratoryRepository extends JpaRepository<SubjectLabora
                                                                     @Param("semester") int semester,
                                                                     @Param("day") int day);
 
+
+    @Query("SELECT NEW ipn.esimecu.labscan.dto.SubjectLabNameResultDTO(al.id, a.subjectId, g.name) " +
+            "FROM SubjectLaboratoryEntity al " +
+            "LEFT JOIN al.subject a " +
+            "LEFT JOIN a.group g " +
+            "WHERE a.semester.semesterId = :semester")
+    List<SubjectLabNameResultDTO> findBySemester(int semester);
+
 }

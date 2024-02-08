@@ -4,8 +4,8 @@ import ipn.esimecu.labscan.dto.request.LoginRequest;
 import ipn.esimecu.labscan.entity.UserEntity;
 import ipn.esimecu.labscan.exception.UnsentMailException;
 import ipn.esimecu.labscan.repository.UserRepository;
-import ipn.esimecu.labscan.repository.util.JwtTokenProvider;
-import ipn.esimecu.labscan.repository.util.Util;
+import ipn.esimecu.labscan.util.JwtTokenProvider;
+import ipn.esimecu.labscan.util.Util;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 @Service

@@ -12,13 +12,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class AttendanceBaseDTO extends StudentBaseDTO {
+public class AttendanceBaseDTO extends StudentBaseDTO implements Cloneable {
     
     @JsonProperty("attendance_id")
     private int attendanceId;
 
-    @JsonProperty("subject_id")
-    private int subjectId;
+    @JsonProperty("subject_lab_id")
+    private int subjectLabId;
 
     private String observations;
 
@@ -34,14 +34,26 @@ public class AttendanceBaseDTO extends StudentBaseDTO {
 
         if (attendanceId == that.attendanceId) return true;
 
-        return subjectId == that.subjectId && super.equals(o);
+        return subjectLabId == that.subjectLabId && super.equals(o);
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + attendanceId;
-        result = 31 * result + subjectId;
+        result = 31 * result + subjectLabId;
         return result + super.hashCode();
+    }
+
+    @Override
+    public AttendanceBaseDTO clone() {
+        AttendanceBaseDTO base = new AttendanceBaseDTO(attendanceId, subjectLabId, observations, attendance);
+        base.setStudentId(getStudentId());
+        base.setStudentFullName(getStudentFullName());
+        base.setStudentQrCode(getStudentQrCode());
+        base.setStudentPcNumber(getStudentPcNumber());
+        base.setStudentReportNumber(getStudentReportNumber());
+        base.setStudentIdentificationType(getStudentIdentificationType());
+        return base;
     }
 }

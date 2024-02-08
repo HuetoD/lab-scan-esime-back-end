@@ -1,6 +1,7 @@
 package ipn.esimecu.labscan.web.security;
 
-import ipn.esimecu.labscan.repository.util.JwtTokenProvider;
+import ipn.esimecu.labscan.exception.ExceptionHandling;
+import ipn.esimecu.labscan.util.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +28,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        System.out.println("JwtAuthorizationFilter.doFilterInternal");
         if(request.getMethod().equalsIgnoreCase("OPTIONS")) {
             response.setStatus(HttpStatus.OK.value());
         } else {
@@ -41,9 +41,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             String token = authorizationHeader.replace(SecurityConstant.JWT_TOKEN_PREFIX, "");
             String username = jwtTokenProvider.getSubject(token);
 
-            System.out.println("token = " +  token);
-            System.out.println("username = " + username);
-
             boolean isTokenValid = jwtTokenProvider.isTokenValid(username, token);
             boolean isAuthNull = SecurityContextHolder.getContext().getAuthentication() == null;
 
@@ -51,14 +48,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 if(isTokenValid &&  isAuthNull) {
                     List<GrantedAuthority> authorities = jwtTokenProvider.getAuthorities(token);
                     Authentication authentication = jwtTokenProvider.getAuthentication(username, authorities, request);
-                    System.out.println("Is authenticated: " + authentication.isAuthenticated());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
                     SecurityContextHolder.clearContext();
                 }
             } catch (Exception e) {
                 log.error(e.toString());
-                SecurityConstant.handleUnauthorized(response);
+                ExceptionHandling.handleUnauthorized(response);
             }
         }
         filterChain.doFilter(request, response);

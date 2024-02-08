@@ -25,8 +25,8 @@ import lombok.ToString;
 @Table(name = "asignaturas")
 @Getter
 @Setter
-@EqualsAndHashCode(exclude = {"studentSubjects", "attendances", "schedules", "subjectLaboratories"})
-@ToString(exclude = {"studentSubjects", "attendances", "schedules", "subjectLaboratories"})
+@EqualsAndHashCode(exclude = {"schedules"})
+@ToString(exclude = {"schedules", "subjectLaboratories"})
 @AllArgsConstructor
 @NoArgsConstructor
 public class SubjectEntity {
@@ -35,12 +35,6 @@ public class SubjectEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "asignatura_id")
     private int subjectId;
-
-    @OneToMany(mappedBy = "subject", fetch = FetchType.LAZY)
-    private List<StudentSubjectEntity> studentSubjects;
-
-    @OneToMany(mappedBy = "subject", fetch = FetchType.LAZY)
-    private List<AttendanceEntity> attendances;
 
     @OneToMany(mappedBy = "subject", fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
     private List<ScheduleEntity> schedules;
